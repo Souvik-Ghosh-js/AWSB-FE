@@ -1,0 +1,48 @@
+# Netlify build config — storefront.
+#
+# Pinned here rather than set in the Netlify UI so the build is reproducible
+# and reviewable in the repo.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+# Required for Next.js App Router on Netlify: server components, SSG with ISR
+# and dynamic routes all need this plugin.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # Values here are a fallback; .env.production in the repo takes precedence
+  # for NEXT_PUBLIC_* at build time. Set NEXT_PUBLIC_RAZORPAY_KEY_ID in the
+  # Netlify UI once you have the live key, then trigger a redeploy.
+  NEXT_PUBLIC_API_URL = "https://api.attarworldsonarbangla.com/api/v1"
+  NEXT_PUBLIC_SITE_URL = "https://attarworldsonarbangla.com"
+  NEXT_PUBLIC_USE_MOCKS = "false"
+
+# The storefront is public and should be indexed, so no blanket noindex here.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+# Cart, checkout and order pages must never be cached by a CDN or proxy —
+# they are per-customer and contain personal data.
+[[headers]]
+  for = "/cart"
+  [headers.values]
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/checkout"
+  [headers.values]
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/order/*"
+  [headers.values]
+    Cache-Control = "no-store"
+    X-Robots-Tag = "noindex, nofollow"

@@ -122,15 +122,15 @@ function Hero() {
           <div className="aw-fade-up lg:col-span-6">
             <p className="aw-eyebrow aw-eyebrow-accent">Est. in Rajarhat, Kolkata</p>
 
-            <h1 className="mt-6 text-[2.5rem] leading-[1.05] sm:text-[3.5rem] lg:text-[4.25rem]">
+            <h1 className="mt-6 text-4xl sm:text-5xl lg:text-[4.5rem]">
               The quiet art of
               <br />
-              <em className="font-[300] not-italic">Bengal attar</em>
+              <span className="text-brand-soft">Bengal attar</span>
             </h1>
 
             <hr className="aw-rule mt-8 max-w-[14rem]" />
 
-            <p className="mt-8 max-w-lg text-base leading-[1.8] text-muted">
+            <p className="mt-8 max-w-lg text-lg leading-[1.75] text-soft">
               Alcohol-free perfume oils, aged in glass and decanted by hand. Oud, rose,
               musk and amber — worn close to the skin, the way attar has always been
               worn.
@@ -145,19 +145,18 @@ function Hero() {
               </Link>
             </div>
 
-            <dl className="mt-12 grid max-w-md grid-cols-3 gap-6 border-t border-line pt-7">
+            {/* Three columns at 390px forced the page wider than the viewport
+                and clipped the third item, so this stacks to two columns on a
+                phone and only opens to three when there is room. */}
+            <dl className="mt-12 grid max-w-md grid-cols-2 gap-x-6 gap-y-7 border-t border-line pt-7 sm:grid-cols-3">
               {[
                 { term: '3 · 6 · 12', detail: 'millilitre bottles' },
                 { term: 'Alcohol', detail: 'free, always' },
                 { term: 'Hand', detail: 'decanted in Kolkata' },
               ].map((item) => (
                 <div key={item.term}>
-                  <dt className="font-[family-name:var(--font-display)] text-xl text-accent">
-                    {item.term}
-                  </dt>
-                  <dd className="mt-1 text-[0.6875rem] tracking-[0.06em] text-muted uppercase">
-                    {item.detail}
-                  </dd>
+                  <dt className="aw-display text-xl text-accent">{item.term}</dt>
+                  <dd className="mt-1.5 text-xs text-soft">{item.detail}</dd>
                 </div>
               ))}
             </dl>
@@ -165,7 +164,7 @@ function Hero() {
 
           {/* Hero still life */}
           <div className="lg:col-span-6">
-            <div className="aw-plate relative mx-auto aspect-[4/5] w-full max-w-[26rem] overflow-hidden rounded-sm border border-line lg:max-w-none">
+            <div className="aw-plate relative mx-auto aspect-[4/5] w-full max-w-[26rem] overflow-hidden rounded-lg border border-line lg:max-w-none">
               <div className="absolute inset-0 flex items-center justify-center">
                 <HeroBottle />
               </div>

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Cormorant_Garamond, Inter } from 'next/font/google';
+import { Fraunces, Inter } from 'next/font/google';
 
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
@@ -8,16 +8,29 @@ import { SHOP } from '@/lib/shop';
 import '@/styles/globals.css';
 
 /**
- * Cormorant Garamond for display, Inter for UI — a classical serif against a
- * quiet humanist sans, as the design direction specifies.
+ * Fraunces for display, Inter for UI.
+ *
+ * Fraunces replaced Cormorant Garamond: Cormorant is a Garamond revival with
+ * very thin strokes, and at the weights it was used here (300-400) headings
+ * got LIGHTER as they got bigger, so nothing on the page carried any weight.
+ * Fraunces is a variable "soft serif" with real mass at 600-700 and a slight
+ * wonk that reads warm rather than corporate — heritage, but contemporary.
+ *
+ * `opsz` is the optical-size axis: at display sizes it sharpens the contrast
+ * and tightens the joins, which is exactly what large product names want.
  *
  * `display: 'swap'` so a slow font never blocks first paint, and the CSS
  * variables are consumed by --font-display / --font-sans in globals.css.
  */
-const cormorant = Cormorant_Garamond({
+const fraunces = Fraunces({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-  variable: '--font-cormorant',
+  // No `weight` here on purpose: Fraunces is a variable font, and next/font
+  // rejects `axes` unless the weight axis is left variable ("Axes can only be
+  // defined for variable fonts when the weight property is nonexistent or set
+  // to `variable`"). Omitting it ships the full 100-900 range, which is what
+  // the headings want anyway — they set weight 600 in CSS.
+  axes: ['opsz'],
+  variable: '--font-fraunces',
   display: 'swap',
 });
 
@@ -84,7 +97,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-IN" className={`${cormorant.variable} ${inter.variable}`}>
+    <html lang="en-IN" className={`${fraunces.variable} ${inter.variable}`}>
       <body>
         {/* Keyboard users should not have to tab through the whole nav to
             reach a long checkout form. */}

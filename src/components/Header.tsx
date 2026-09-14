@@ -46,11 +46,17 @@ export function Header() {
 
   return (
     <>
-      {/* Announcement bar. The one place shipping is advertised sitewide. */}
-      <div className="bg-brand text-[#e9e3d4]">
+      {/* Announcement bar. The one place shipping is advertised sitewide.
+          The full sentence does not fit on a phone — it used to be clipped
+          mid-word ("Delivered a…"), so the middle claim is dropped at small
+          widths rather than truncated. */}
+      <div className="bg-brand-deep text-[#e9e3d4]">
         <div className="aw-container flex min-h-9 items-center justify-center py-2 text-center">
-          <p className="text-[0.6875rem] tracking-[0.08em] sm:text-xs">
-            Hand-decanted in Rajarhat · Free of alcohol · Delivered across India
+          <p className="text-2xs tracking-[0.06em] sm:text-xs">
+            Hand-decanted in Rajarhat
+            <span className="hidden sm:inline"> · Free of alcohol</span>
+            <span aria-hidden="true"> · </span>
+            Delivered across India
           </p>
         </div>
       </div>

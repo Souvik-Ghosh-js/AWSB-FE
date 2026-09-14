@@ -31,8 +31,8 @@ export function SectionHeading({
       <Tag
         className={
           Tag === 'h1'
-            ? 'text-[2rem] leading-[1.1] sm:text-[2.75rem] lg:text-[3.25rem]'
-            : 'text-[1.625rem] leading-[1.15] sm:text-[2rem] lg:text-[2.25rem]'
+            ? 'text-3xl sm:text-4xl lg:text-5xl'
+            : 'text-2xl sm:text-3xl'
         }
       >
         {title}
@@ -40,11 +40,11 @@ export function SectionHeading({
       {centered ? (
         <hr className="aw-rule-center mt-5" />
       ) : (
-        <hr className="aw-rule mt-5 max-w-[16rem]" />
+        <hr className="aw-rule mt-5 max-w-[14rem]" />
       )}
       {description ? (
         <p
-          className={`mt-5 text-[0.9375rem] leading-relaxed text-muted ${
+          className={`mt-5 text-lg leading-relaxed text-soft ${
             centered ? 'mx-auto max-w-2xl' : 'max-w-2xl'
           }`}
         >
@@ -86,7 +86,7 @@ export function ErrorState({
         !
       </span>
       <h3 className="text-xl sm:text-2xl">{title}</h3>
-      <p className="mt-3 max-w-md text-sm text-muted">
+      <p className="mt-3 max-w-md text-base text-soft">
         {message ??
           'The shop is having trouble reaching its catalogue. This is usually brief — please try again in a moment.'}
       </p>
@@ -116,11 +116,23 @@ export function EmptyState({
         compact ? 'px-5 py-10' : 'px-6 py-16 sm:py-24'
       }`}
     >
-      <span aria-hidden="true" className="mb-5 text-2xl text-accent opacity-70">
-        ❧
-      </span>
+      {/* Was a "❧" character, which fell back to a system glyph and read as
+          stray punctuation rather than an ornament. Drawn instead. */}
+      <svg
+        viewBox="0 0 48 24"
+        aria-hidden="true"
+        className="mb-5 h-4 w-20 text-accent"
+        fill="none"
+      >
+        <path d="M2 12h13M33 12h13" stroke="currentColor" strokeWidth="1" opacity="0.45" />
+        <path
+          d="M24 5.5c2.6 0 4.4 1.9 4.4 4.1 0 3-3 5.3-4.4 8.9-1.4-3.6-4.4-5.9-4.4-8.9 0-2.2 1.8-4.1 4.4-4.1z"
+          stroke="currentColor"
+          strokeWidth="1.2"
+        />
+      </svg>
       <h3 className="text-xl sm:text-2xl">{title}</h3>
-      {message ? <p className="mt-3 max-w-md text-sm text-muted">{message}</p> : null}
+      {message ? <p className="mt-3 max-w-md text-base text-soft">{message}</p> : null}
       {action ? <div className="mt-7">{action}</div> : null}
     </div>
   );
@@ -239,7 +251,7 @@ export function Stars({
   size?: 'sm' | 'md';
 }) {
   if (rating == null) {
-    return <span className="text-xs text-muted">No reviews yet</span>;
+    return <span className="text-xs text-soft">No reviews yet</span>;
   }
 
   const dim = size === 'md' ? 'h-4 w-4' : 'h-3.5 w-3.5';
@@ -267,7 +279,7 @@ export function Stars({
         ))}
       </span>
       {count != null ? (
-        <span className="text-xs text-muted">
+        <span className="text-xs font-medium text-soft">
           {rating.toFixed(1)} ({count})
         </span>
       ) : null}
@@ -291,7 +303,7 @@ export function Breadcrumbs({
   items: { href?: string; label: string }[];
 }) {
   return (
-    <nav aria-label="Breadcrumb" className="text-xs text-muted">
+    <nav aria-label="Breadcrumb" className="text-xs text-soft">
       <ol className="flex flex-wrap items-center gap-1.5">
         {items.map((item, i) => (
           <li key={`${item.label}-${i}`} className="flex items-center gap-1.5">
@@ -314,13 +326,26 @@ export function Breadcrumbs({
   );
 }
 
-/** Thin gold rule used as a decorative divider between page sections. */
+/**
+ * Decorative divider between page sections.
+ *
+ * Was a "❦" text character, which has no glyph in either webfont and fell
+ * back to whatever the system had — it rendered as a speck of punctuation.
+ * Drawn as SVG so it is the same mark on every machine.
+ */
 export function Ornament({ className = '' }: { className?: string }) {
   return (
-    <div className={`flex items-center justify-center gap-3 ${className}`} aria-hidden="true">
-      <span className="h-px w-12 bg-line-strong sm:w-20" />
-      <span className="text-sm text-accent">❦</span>
-      <span className="h-px w-12 bg-line-strong sm:w-20" />
+    <div className={`flex items-center justify-center ${className}`} aria-hidden="true">
+      <svg viewBox="0 0 160 20" className="h-5 w-40 text-accent" fill="none">
+        <path d="M4 10h54M102 10h54" stroke="currentColor" strokeWidth="1" opacity="0.4" />
+        <path
+          d="M80 3.5c3.1 0 5.2 2.2 5.2 4.9 0 3.5-3.6 6.2-5.2 10.1-1.6-3.9-5.2-6.6-5.2-10.1 0-2.7 2.1-4.9 5.2-4.9z"
+          stroke="currentColor"
+          strokeWidth="1.2"
+        />
+        <circle cx="66" cy="10" r="1.4" fill="currentColor" opacity="0.7" />
+        <circle cx="94" cy="10" r="1.4" fill="currentColor" opacity="0.7" />
+      </svg>
     </div>
   );
 }

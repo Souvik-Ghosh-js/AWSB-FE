@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { discountPercent, formatPaise } from '@/lib/format';
+import { formatPaise } from '@/lib/format';
 import type { ProductSummary } from '@/lib/types';
 import { Stars } from './ui';
 
@@ -23,15 +23,23 @@ export function ProductCard({
 }) {
   const image = product.primaryImage;
   const soldOut = product.inStock === false;
-  const saving = discountPercent(product.minPricePaise, product.maxPricePaise ?? null);
+
+  // NO "Save x%" badge here.
+  //
+  // This used to read discountPercent(minPricePaise, maxPricePaise), which is
+  // not a discount at all: min is the 3ml price and max is the 12ml price, so
+  // every product in the catalogue advertised a fake ~71% saving. A summary
+  // carries no compare-at price, so a genuine discount cannot be computed from
+  // it — the real per-size saving is shown on the product page, where
+  // variant.compareAtPaise actually exists.
 
   return (
-    <article className="group flex flex-col">
+    <article className="group aw-tile flex flex-col">
       <Link
         href={`/product/${product.slug}`}
         className="block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
       >
-        <div className="aw-plate relative aspect-[4/5] w-full overflow-hidden rounded-sm border border-line">
+        <div className="aw-plate relative aspect-[4/5] w-full overflow-hidden border-b border-line">
           {image ? (
             <Image
               src={image.url}
@@ -58,20 +66,15 @@ export function ProductCard({
             </div>
           ) : null}
 
-          {!soldOut && saving ? (
-            <span className="absolute top-3 left-3 bg-brand px-2 py-1 text-[0.625rem] font-medium tracking-[0.1em] text-[#f7f4ea] uppercase">
-              Save {saving}%
-            </span>
-          ) : null}
         </div>
       </Link>
 
-      <div className="mt-4 flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
         {product.scentFamily ? (
-          <p className="aw-eyebrow mb-2 text-[0.625rem]">{product.scentFamily}</p>
+          <p className="aw-eyebrow mb-2">{product.scentFamily}</p>
         ) : null}
 
-        <h3 className="text-lg leading-snug sm:text-xl">
+        <h3 className="text-lg sm:text-xl">
           <Link
             href={`/product/${product.slug}`}
             className="aw-link-underline transition-colors hover:text-brand-soft"
@@ -81,20 +84,22 @@ export function ProductCard({
         </h3>
 
         {product.tagline ? (
-          <p className="mt-1.5 line-clamp-2 text-[0.8125rem] leading-relaxed text-muted">
+          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-soft">
             {product.tagline}
           </p>
         ) : null}
 
-        <div className="mt-3 flex items-center gap-3">
-          {product.ratingCount > 0 ? (
+        {product.ratingCount > 0 ? (
+          <div className="mt-3">
             <Stars rating={product.ratingAvg} count={product.ratingCount} />
-          ) : null}
-        </div>
+          </div>
+        ) : null}
 
-        <p className="mt-3.5 flex items-baseline gap-1.5">
-          <span className="text-[0.6875rem] tracking-[0.1em] text-muted uppercase">From</span>
-          <span className="aw-price text-lg sm:text-xl">
+        {/* Pinned to the bottom so prices line up across a row of cards whose
+            taglines wrap to different heights. */}
+        <p className="mt-auto flex items-baseline gap-1.5 pt-4">
+          <span className="text-xs text-muted">From</span>
+          <span className="aw-price text-xl sm:text-2xl">
             {formatPaise(product.minPricePaise, { compact: true })}
           </span>
         </p>
