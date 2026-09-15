@@ -30,7 +30,7 @@ export function Footer() {
 
           {/* Shop */}
           <div className="lg:col-span-2">
-            <h2 className="aw-eyebrow mb-4">Shop</h2>
+            <p className="aw-eyebrow mb-4">Shop</p>
             <ul className="space-y-2.5">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
@@ -47,7 +47,7 @@ export function Footer() {
 
           {/* Policies — required by Razorpay */}
           <div className="lg:col-span-3">
-            <h2 className="aw-eyebrow mb-4">Policies</h2>
+            <p className="aw-eyebrow mb-4">Policies</p>
             <ul className="space-y-2.5">
               {POLICY_LINKS.map((link) => (
                 <li key={link.href}>
@@ -64,7 +64,7 @@ export function Footer() {
 
           {/* Contact */}
           <div className="lg:col-span-3">
-            <h2 className="aw-eyebrow mb-4">Visit &amp; Contact</h2>
+            <p className="aw-eyebrow mb-4">Visit &amp; Contact</p>
             <address className="text-[0.8125rem] leading-relaxed text-muted not-italic">
               {SHOP.address.line1}, {SHOP.address.line2}
               <br />

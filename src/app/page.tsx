@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import Image from 'next/image';
 
 import { ProductCard } from '@/components/ProductCard';
-import { EmptyState, ErrorState, Ornament, SectionHeading } from '@/components/ui';
+import { Photo } from '@/components/Photo';
+import { EmptyState, ErrorState, SectionHeading } from '@/components/ui';
 import { fetchCategories, fetchFeatured } from '@/lib/data';
 import { SHOP } from '@/lib/shop';
 
@@ -11,17 +11,21 @@ import { SHOP } from '@/lib/shop';
  *
  * A server component: the featured attars must be in the HTML for indexing,
  * not fetched after hydration.
+ *
+ * Structure borrows from the reference the owner chose — full-bleed
+ * photographic hero, a trust bar, a numbered "how it works", testimonials —
+ * but in this house's own palette. A fragrance shop dressed as a services site
+ * would look like a booking form.
  */
 export const revalidate = 300;
 
 export default async function HomePage() {
-  // Both sections are independent, so fetch them concurrently rather than
-  // waterfalling one behind the other.
   const [featured, categories] = await Promise.all([fetchFeatured(4), fetchCategories()]);
 
   return (
     <>
       <Hero />
+      <TrustBar />
 
       {/* ------------------------------------------------ featured attars */}
       <section className="aw-container mt-20 sm:mt-28">
@@ -55,48 +59,23 @@ export default async function HomePage() {
         </div>
 
         {featured.ok && featured.data.length > 0 ? (
-          <div className="mt-12 text-center sm:mt-16">
+          <div className="mt-14 text-center">
             <Link href="/shop" className="aw-btn aw-btn-outline">
-              View the full collection
+              See the whole collection
             </Link>
           </div>
         ) : null}
       </section>
 
-      <Ornament className="mt-20 sm:mt-28" />
-
-      {/* --------------------------------------------------- brand story */}
-      <BrandStory />
-
-      {/* ---------------------------------------------------- categories */}
-      {categories.ok && categories.data.length > 0 ? (
-        <section className="aw-container mt-20 sm:mt-28">
-          <SectionHeading
-            eyebrow="By Character"
-            title="Find your family"
-            align="center"
-          />
-          <ul className="mt-10 flex flex-wrap justify-center gap-3 sm:mt-12">
-            {categories.data.map((category) => (
-              <li key={category.id}>
-                <Link
-                  href={`/shop?category=${encodeURIComponent(category.slug)}`}
-                  className="inline-flex items-center gap-2 border border-line-strong bg-surface px-5 py-2.5 text-[0.8125rem] tracking-[0.04em] text-ink transition-colors hover:border-brand hover:text-brand"
-                >
-                  {category.name}
-                  {category.productCount != null && category.productCount > 0 ? (
-                    <span className="text-[0.6875rem] text-muted">
-                      {category.productCount}
-                    </span>
-                  ) : null}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      <Assurances />
+      {/* Array.isArray, not just `.ok`: a prerender crash takes down the whole
+          build, so the homepage must survive an unexpected response shape
+          rather than trust the declared type. */}
+      <ScentFamilies
+        categories={categories.ok && Array.isArray(categories.data) ? categories.data : []}
+      />
+      <HowItWorks />
+      <Testimonials />
+      <ClosingBand />
     </>
   );
 }
@@ -105,76 +84,57 @@ export default async function HomePage() {
 
 function Hero() {
   return (
-    <section className="relative overflow-hidden border-b border-line">
-      {/* Soft ivory wash with a faint gold bloom, rather than a photograph we
-          do not have. Real photography drops straight in here. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(60% 55% at 78% 18%, rgba(176,141,63,0.16) 0%, rgba(176,141,63,0) 62%), radial-gradient(70% 60% at 12% 82%, rgba(20,67,42,0.10) 0%, rgba(20,67,42,0) 60%)',
-        }}
-      />
+    <section className="relative isolate overflow-hidden bg-brand-deep">
+      {/* One real photograph, full bleed. The reference site's single strongest
+          move: a picture doing the talking rather than a gradient. */}
+      <div className="absolute inset-0">
+        <Photo
+          src="/img/oud.jpg"
+          alt="Attar oils resting in glass vials"
+          ratio="h-full w-full"
+          className="h-full w-full"
+          priority
+          sizes="100vw"
+        />
+        {/* Two layers: a wash for mood, a left-weighted scrim so the text has
+            real contrast rather than relying on the photo being dark enough. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(180deg, rgba(13,46,29,0.55) 0%, rgba(13,46,29,0.78) 100%)' }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(90deg, rgba(13,46,29,0.88) 0%, rgba(13,46,29,0.45) 55%, rgba(13,46,29,0.15) 100%)' }}
+        />
+      </div>
 
-      <div className="aw-container relative py-20 sm:py-28 lg:py-36">
-        <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-16">
-          <div className="aw-fade-up lg:col-span-6">
-            <p className="aw-eyebrow aw-eyebrow-accent">Est. in Rajarhat, Kolkata</p>
+      <div className="aw-container relative py-24 sm:py-32 lg:py-44">
+        <div className="max-w-2xl">
+          <p className="aw-eyebrow text-accent-soft">Est. in Rajarhat, Kolkata</p>
 
-            <h1 className="mt-6 text-4xl sm:text-5xl lg:text-[4.5rem]">
-              The quiet art of
-              <br />
-              <span className="text-brand-soft">Bengal attar</span>
-            </h1>
+          <h1 className="mt-6 text-4xl text-white sm:text-5xl lg:text-[4.25rem] lg:leading-[1.05]">
+            The quiet art of
+            <br />
+            <span className="text-accent-bright">Bengal attar</span>
+          </h1>
 
-            <hr className="aw-rule mt-8 max-w-[14rem]" />
+          <p className="mt-7 max-w-xl text-lg leading-[1.75] text-white/80">
+            Alcohol-free perfume oils, aged in glass and decanted by hand. Oud, rose,
+            musk and amber — worn close to the skin, the way attar has always been worn.
+          </p>
 
-            <p className="mt-8 max-w-lg text-lg leading-[1.75] text-soft">
-              Alcohol-free perfume oils, aged in glass and decanted by hand. Oud, rose,
-              musk and amber — worn close to the skin, the way attar has always been
-              worn.
-            </p>
-
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link href="/shop" className="aw-btn aw-btn-primary">
-                Explore the collection
-              </Link>
-              <Link href="/about" className="aw-btn aw-btn-outline">
-                Our house
-              </Link>
-            </div>
-
-            {/* Three columns at 390px forced the page wider than the viewport
-                and clipped the third item, so this stacks to two columns on a
-                phone and only opens to three when there is room. */}
-            <dl className="mt-12 grid max-w-md grid-cols-2 gap-x-6 gap-y-7 border-t border-line pt-7 sm:grid-cols-3">
-              {[
-                { term: '3 · 6 · 12', detail: 'millilitre bottles' },
-                { term: 'Alcohol', detail: 'free, always' },
-                { term: 'Hand', detail: 'decanted in Kolkata' },
-              ].map((item) => (
-                <div key={item.term}>
-                  <dt className="aw-display text-xl text-accent">{item.term}</dt>
-                  <dd className="mt-1.5 text-xs text-soft">{item.detail}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-
-          {/* Hero still life */}
-          <div className="lg:col-span-6">
-            <div className="aw-plate relative mx-auto aspect-[4/5] w-full max-w-[26rem] overflow-hidden rounded-lg border border-line lg:max-w-none">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <HeroBottle />
-              </div>
-              <div className="absolute right-5 bottom-5 left-5 border-t border-[color-mix(in_srgb,var(--color-accent)_40%,transparent)] pt-4">
-                <p className="aw-eyebrow aw-eyebrow-accent">Signature</p>
-                <p className="mt-1.5 font-[family-name:var(--font-display)] text-xl text-brand">
-                  Waalid Shamama
-                </p>
-              </div>
-            </div>
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Link href="/shop" className="aw-btn aw-btn-primary">
+              Explore the collection
+            </Link>
+            <Link
+              href="/about"
+              className="aw-btn border border-white/25 text-white hover:bg-white/10"
+            >
+              Our house
+            </Link>
           </div>
         </div>
       </div>
@@ -182,130 +142,218 @@ function Hero() {
   );
 }
 
-/** Drawn hero bottle — a placeholder for real product photography. */
-function HeroBottle() {
+/* -------------------------------------------------------------- trust bar */
+
+/**
+ * The reference site puts its credibility markers immediately under the hero.
+ * These are all verifiable facts about this shop — nothing invented, and no
+ * review counts or customer numbers, because the shop has not opened yet.
+ */
+function TrustBar() {
+  const facts = [
+    { stat: '3 · 6 · 12', label: 'millilitre bottles' },
+    { stat: '100%', label: 'alcohol-free oils' },
+    { stat: 'Hand', label: 'decanted in Kolkata' },
+    { stat: '₹49', label: 'delivery within Kolkata' },
+  ];
+
   return (
-    <svg
-      viewBox="0 0 320 420"
-      className="h-[78%] w-auto drop-shadow-[0_18px_28px_rgba(31,42,36,0.14)]"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="hero-glass" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#3f2d1a" stopOpacity="0.96" />
-          <stop offset="32%" stopColor="#ffffff" stopOpacity="0.5" />
-          <stop offset="60%" stopColor="#3f2d1a" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="#2b1e10" />
-        </linearGradient>
-        <linearGradient id="hero-liquid" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#8a5a1c" stopOpacity="0.7" />
-          <stop offset="100%" stopColor="#5c3408" />
-        </linearGradient>
-        <linearGradient id="hero-cap" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#9c7a33" />
-          <stop offset="44%" stopColor="#f0e2bd" />
-          <stop offset="100%" stopColor="#9c7a33" />
-        </linearGradient>
-      </defs>
-
-      <ellipse cx="160" cy="396" rx="92" ry="14" fill="#1f2a24" opacity="0.12" />
-      <rect x="132" y="24" width="56" height="44" rx="4" fill="url(#hero-cap)" />
-      <rect x="143" y="10" width="34" height="18" rx="3" fill="#b08d3f" />
-      <rect x="146" y="64" width="28" height="26" fill="#3f2d1a" opacity="0.5" />
-      <path
-        d="M96 90 h128 a22 22 0 0 1 22 22 v208 a48 48 0 0 1 -48 48 h-76 a48 48 0 0 1 -48 -48 v-208 a22 22 0 0 1 22 -22 z"
-        fill="url(#hero-glass)"
-      />
-      <path
-        d="M104 196 h112 v124 a40 40 0 0 1 -40 40 h-32 a40 40 0 0 1 -40 -40 z"
-        fill="url(#hero-liquid)"
-      />
-      <rect x="112" y="228" width="96" height="76" rx="2" fill="#faf7f0" opacity="0.94" />
-      <rect x="126" y="250" width="68" height="1.6" fill="#b08d3f" />
-      <rect x="126" y="268" width="46" height="1.4" fill="#7a8079" opacity="0.7" />
-      <rect x="126" y="280" width="58" height="1.4" fill="#7a8079" opacity="0.5" />
-      <path d="M112 112 q16 -10 32 0 v190 q-16 10 -32 0 z" fill="#ffffff" opacity="0.26" />
-    </svg>
-  );
-}
-
-/* ----------------------------------------------------------- brand story */
-
-function BrandStory() {
-  return (
-    <section className="mt-20 border-y border-line bg-surface-alt sm:mt-28">
-      <div className="aw-container py-16 sm:py-24">
-        <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-5">
-            <SectionHeading eyebrow="Our House" title="Attar, as it was meant to be" />
-          </div>
-
-          <div className="lg:col-span-7">
-            <div className="space-y-5 text-[0.9375rem] leading-[1.85] text-ink">
-              <p>
-                An attar is a perfume oil — no alcohol, no filler, no propellant. It is
-                worn on the pulse points, where the warmth of the skin opens it slowly
-                over the course of a day. That slowness is the whole point.
-              </p>
-              <p>
-                We work from {SHOP.address.line1}, in {SHOP.address.line2}, sourcing
-                oils from the distilleries that still make them the old way — Kannauj
-                for rose and shamama, Assam and the southern coast for oud and sandal —
-                and blending in lots small enough that every bottle is filled by hand.
-              </p>
-              <p>
-                Nothing here is mass produced, and nothing is pretending to be
-                something it is not. When a fragrance sells out, it stays sold out until
-                the next lot is ready.
-              </p>
+    <section className="border-b border-line bg-surface">
+      <div className="aw-container">
+        <dl className="grid grid-cols-2 divide-line sm:grid-cols-4 sm:divide-x">
+          {facts.map((f) => (
+            <div key={f.label} className="px-2 py-7 text-center sm:px-6 sm:py-8">
+              <dt className="aw-display text-xl text-brand sm:text-2xl">{f.stat}</dt>
+              <dd className="mt-1.5 text-xs text-soft sm:text-sm">{f.label}</dd>
             </div>
-
-            <div className="mt-9">
-              <Link href="/about" className="aw-btn aw-btn-outline aw-btn-sm">
-                Read our story
-              </Link>
-            </div>
-          </div>
-        </div>
+          ))}
+        </dl>
       </div>
     </section>
   );
 }
 
-/* ------------------------------------------------------------ assurances */
+/* --------------------------------------------------------- scent families */
 
-function Assurances() {
-  const items = [
+function ScentFamilies({ categories }: { categories: { id: number; slug: string; name: string }[] }) {
+  // Only the two families with a verified photograph get one; the rest render
+  // as composed panels rather than borrowed pictures.
+  const art: Record<string, string> = {
+    oud: '/img/oud.jpg',
+    rose: '/img/rose.jpg',
+    floral: '/img/rose.jpg',
+    musk: '/img/musk.jpg',
+  };
+
+  const shown = categories.slice(0, 4);
+  if (shown.length === 0) return null;
+
+  return (
+    <section className="aw-container mt-24 sm:mt-32">
+      <SectionHeading
+        eyebrow="By character"
+        title="Find your family"
+        description="Attar is read by its family before its name. Start where your nose already leans."
+        align="center"
+      />
+
+      <div className="mt-12 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+        {shown.map((c) => (
+          <Link
+            key={c.id}
+            href={`/shop?category=${encodeURIComponent(c.slug)}`}
+            className="group relative overflow-hidden rounded-lg"
+          >
+            <Photo
+              src={art[c.slug] ?? null}
+              alt={`${c.name} attars`}
+              label={c.name}
+              ratio="aspect-[3/4]"
+              zoom
+              sizes="(min-width: 1024px) 25vw, 50vw"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0"
+              style={{ background: 'linear-gradient(180deg, transparent 45%, rgba(13,46,29,0.82) 100%)' }}
+            />
+            <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+              <p className="aw-display text-lg text-white sm:text-xl">{c.name}</p>
+              <p className="mt-0.5 text-xs text-white/70">Explore →</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------------------------------------- how it works */
+
+/**
+ * Numbered because it genuinely is a sequence — choose, then we decant, then it
+ * ships. Numbering a set of unordered features would be decoration.
+ */
+function HowItWorks() {
+  const steps = [
     {
-      title: 'Free of alcohol',
-      body: 'Pure perfume oil. Gentler on skin, and it lasts far longer than a spray.',
+      n: '01',
+      title: 'Choose your size',
+      body: 'Every attar comes in 3ml, 6ml and 12ml. Start at 3ml if it is new to you — it is a real bottle, not a sample vial.',
     },
     {
-      title: 'Three sizes',
-      body: 'Try at 3ml, settle at 6ml, keep a 12ml on the shelf. Each priced on its own.',
+      n: '02',
+      title: 'We decant by hand',
+      body: 'Your bottle is filled and sealed after you order, not pulled from a shelf. Nothing sits open losing its top notes.',
     },
     {
-      title: 'Dispatched quickly',
-      body: `Orders leave us within ${SHOP.shipping.dispatchDays}, carefully wrapped against the heat.`,
-    },
-    {
-      title: 'Secure payment',
-      body: 'UPI, cards and netbanking through Razorpay. We never see your card details.',
+      n: '03',
+      title: 'Tracked to your door',
+      body: 'Dispatched from Rajarhat with a tracking number by email. ₹49 within Kolkata, ₹99 anywhere else in India.',
     },
   ];
 
   return (
-    <section className="aw-container mt-20 sm:mt-28">
-      <div className="grid gap-px overflow-hidden rounded-sm border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
-        {items.map((item) => (
-          <div key={item.title} className="bg-surface p-7 sm:p-8">
-            <span aria-hidden="true" className="text-sm text-accent">
-              ❦
-            </span>
-            <h3 className="mt-3 text-lg">{item.title}</h3>
-            <p className="mt-2 text-[0.8125rem] leading-relaxed text-muted">{item.body}</p>
-          </div>
+    <section className="mt-24 border-y border-line bg-surface-alt py-20 sm:mt-32 sm:py-24">
+      <div className="aw-container">
+        <SectionHeading eyebrow="How it works" title="From our shelf to your wrist" align="center" />
+
+        <ol className="mt-14 grid gap-10 sm:gap-12 lg:grid-cols-3">
+          {steps.map((s) => (
+            <li key={s.n}>
+              <p className="aw-display text-3xl text-accent">{s.n}</p>
+              <hr className="aw-rule mt-4 max-w-[3.5rem]" />
+              <h3 className="mt-5 text-xl">{s.title}</h3>
+              <p className="mt-3 text-[0.9375rem] leading-[1.7] text-soft">{s.body}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------------------------------------------------- testimonials */
+
+/**
+ * Deliberately NOT customer quotes. The shop has not sold anything yet, and
+ * inventing reviews would be a lie a customer could act on. These are notes on
+ * the craft — true, and replaceable with real reviews once they exist.
+ */
+function Testimonials() {
+  const notes = [
+    {
+      title: 'Why oil, not spirit',
+      body: 'Attar carries no alcohol, so it does not flash off in the first ten minutes. It warms with your skin and stays close through the day.',
+    },
+    {
+      title: 'Why small bottles',
+      body: 'Three millilitres of a good attar outlasts a large bottle of eau de toilette. A drop at the wrist and behind the ear is the whole application.',
+    },
+    {
+      title: 'Why it ages',
+      body: 'Oud and amber are laid down in glass and left. Time rounds the sharp edges off a fresh distillation — the wait is part of the making.',
+    },
+  ];
+
+  return (
+    <section className="aw-container mt-24 sm:mt-32">
+      <SectionHeading eyebrow="On attar" title="What makes it different" align="center" />
+
+      <div className="mt-12 grid gap-6 lg:grid-cols-3">
+        {notes.map((n) => (
+          <article
+            key={n.title}
+            className="rounded-lg border border-line bg-surface p-7 shadow-[var(--shadow-card)]"
+          >
+            <h3 className="text-lg">{n.title}</h3>
+            <p className="mt-3 text-[0.9375rem] leading-[1.75] text-soft">{n.body}</p>
+          </article>
         ))}
+      </div>
+    </section>
+  );
+}
+
+/* ----------------------------------------------------------- closing band */
+
+function ClosingBand() {
+  return (
+    <section className="relative isolate mt-24 overflow-hidden sm:mt-32">
+      <div className="absolute inset-0">
+        <Photo
+          src="/img/texture.jpg"
+          alt=""
+          ratio="h-full w-full"
+          className="h-full w-full"
+          sizes="100vw"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(90deg, rgba(13,46,29,0.94) 0%, rgba(13,46,29,0.80) 100%)' }}
+        />
+      </div>
+
+      <div className="aw-container relative py-20 text-center sm:py-24">
+        <h2 className="mx-auto max-w-2xl text-3xl text-white sm:text-4xl">
+          Not sure where to begin?
+        </h2>
+        <p className="mx-auto mt-5 max-w-xl text-[1.0625rem] leading-[1.75] text-white/75">
+          Tell us what you already wear, or what you want to smell like, and we will
+          point you at two or three from the shelf. No obligation.
+        </p>
+        <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link href="/contact" className="aw-btn aw-btn-primary">
+            Ask the house
+          </Link>
+          <a
+            href={`tel:+91${SHOP.phones[0]}`}
+            className="aw-btn border border-white/25 text-white hover:bg-white/10"
+          >
+            Call {SHOP.phones[0]}
+          </a>
+        </div>
       </div>
     </section>
   );

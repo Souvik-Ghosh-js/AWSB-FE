@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 
 import type { ProductImage } from '@/lib/types';
+import { Photo } from './Photo';
 
 /**
  * Product gallery — 2 to 3 images per product.
@@ -27,10 +28,17 @@ export function ProductGallery({
   const active = ordered[activeIndex] ?? ordered[0];
 
   if (ordered.length === 0) {
+    // The product page is where a customer decides to spend money, so an empty
+    // plate here costs the most. The composed panel at least presents the
+    // fragrance as an object.
     return (
-      <div className="aw-plate flex aspect-[4/5] w-full items-center justify-center rounded-sm border border-line">
-        <p className="aw-eyebrow">Photography coming soon</p>
-      </div>
+      <Photo
+        src={null}
+        alt={productName}
+        label={productName}
+        ratio="aspect-[4/5] sm:aspect-square"
+        className="w-full rounded-sm border border-line"
+      />
     );
   }
 

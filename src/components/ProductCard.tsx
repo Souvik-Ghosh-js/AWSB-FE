@@ -3,6 +3,7 @@ import Link from 'next/link';
 
 import { formatPaise } from '@/lib/format';
 import type { ProductSummary } from '@/lib/types';
+import { Photo } from './Photo';
 import { Stars } from './ui';
 
 /**
@@ -53,9 +54,16 @@ export function ProductCard({
               unoptimized={image.url.startsWith('data:')}
             />
           ) : (
-            <div className="flex h-full items-center justify-center">
-              <span className="aw-eyebrow">No image</span>
-            </div>
+            // A grey "No image" box makes a real product look broken. The
+            // placeholder is composed instead, so an unphotographed attar still
+            // presents as something on a shelf.
+            <Photo
+              src={null}
+              alt={product.name}
+              label={product.name}
+              ratio="h-full w-full"
+              className="h-full w-full"
+            />
           )}
 
           {soldOut ? (

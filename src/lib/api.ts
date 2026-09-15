@@ -336,11 +336,19 @@ export function getProduct(slug: string): Promise<ProductDetail | null> {
   });
 }
 
-export function getCategories(): Promise<Category[]> {
-  return apiRequest<Category[]>('/categories', {
+export async function getCategories(): Promise<Category[]> {
+  // The API answers {items: [...]}, not a bare array. Typing this as
+  // Promise<Category[]> made TypeScript agree with a lie, and the mock data
+  // (which IS an array) hid it locally — the first real build crashed with
+  // "a.slice is not a function". Unwrap explicitly, and tolerate either shape
+  // so a future API change cannot take the homepage down.
+  const body = await apiRequest<Category[] | { items: Category[] }>('/categories', {
     revalidate: CATALOGUE_REVALIDATE,
     tags: ['categories'],
   });
+
+  if (Array.isArray(body)) return body;
+  return Array.isArray(body?.items) ? body.items : [];
 }
 
 /** Featured attars for the home page. */
