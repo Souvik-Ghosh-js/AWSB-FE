@@ -85,14 +85,28 @@ export interface ProductSummary {
   tagline: string | null;
   scentFamily: string | null;
   isFeatured: boolean;
-  /** Cheapest enabled variant — what the card shows as "from ₹…". */
-  minPricePaise: number;
+  /**
+   * Cheapest enabled variant — what the card shows as "from ₹…".
+   *
+   * The live API sends `fromPricePaise`; `minPricePaise` is the name the
+   * mock data and older code used. The card read only the latter, so every
+   * product on the live site rendered as "From ₹0". Both are declared and
+   * the card reads whichever is present.
+   */
+  fromPricePaise?: number;
+  minPricePaise?: number;
   maxPricePaise?: number;
   primaryImage: ProductImage | null;
   ratingAvg: number | null;
   ratingCount: number;
   /** False when every variant is out of stock. */
   inStock?: boolean;
+  /**
+   * The three sizes with their prices and stock. The public list endpoint
+   * sends these on every summary, which is what lets a card sell directly
+   * — size picker and add-to-cart — without a second request.
+   */
+  variants?: Variant[];
 }
 
 /** Full product detail — /products/:slug. */

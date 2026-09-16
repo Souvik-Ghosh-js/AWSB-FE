@@ -70,8 +70,11 @@ export default async function ShopPage({
       </div>
 
       <div className="mt-10 sm:mt-12">
+        {/* A category with nothing in it is a dead end, not a filter. Until
+            products are assigned to categories, every empty one is hidden
+            rather than offering five buttons that each show "Nothing here". */}
         <ShopFilters
-          categories={categories.ok ? categories.data : []}
+          categories={categories.ok ? categories.data.filter((c) => (c.productCount ?? 0) > 0) : []}
           activeCategory={category}
           activeSort={sort}
           activeSearch={search}
@@ -100,7 +103,10 @@ export default async function ShopPage({
           />
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-x-5 gap-y-10 sm:gap-x-7 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-14">
+            {/* Four across on desktop: the cards now carry a size picker and an
+                Add button, so a denser grid puts more buyable products in
+                view without each card needing to be wide. */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
               {products.data.items.map((product, i) => (
                 <ProductCard key={product.id} product={product} priority={i < 3} />
               ))}

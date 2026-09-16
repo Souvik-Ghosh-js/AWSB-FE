@@ -159,21 +159,33 @@ h3 {
  * and looked frail; Fraunces at 600 has the mass the old design was missing.
  * Negative tracking tightens large serif settings, which otherwise look gappy.
  */
-h1,
-h2,
-h3,
-h4 {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-variation-settings: 'opsz' 42, 'SOFT' 0, 'WONK' 1;
-  letter-spacing: -0.021em;
-  line-height: 1.12;
-  color: var(--color-brand-deep);
-  margin: 0;
-  /* Fraunces defaults to old-style figures; lining reads better in headings
-     that contain sizes and prices. */
-  font-variant-numeric: lining-nums;
-  text-wrap: balance;
+/*
+ * Inside @layer base ON PURPOSE.
+ *
+ * As a bare top-level rule this was unlayered, and unlayered CSS beats every
+ * @layer — so `color` here outranked the `text-white` utility on the hero
+ * heading, and "The quiet art of" rendered dark green on a dark green photo:
+ * invisible. Any heading on any dark ground would have done the same. In the
+ * base layer it is still the default everywhere, but a utility can override
+ * it, which is what a utility is for.
+ */
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-variation-settings: 'opsz' 42, 'SOFT' 0, 'WONK' 1;
+    letter-spacing: -0.024em;
+    line-height: 1.08;
+    color: var(--color-brand-deep);
+    margin: 0;
+    /* Fraunces defaults to old-style figures; lining reads better in headings
+       that contain sizes and prices. */
+    font-variant-numeric: lining-nums;
+    text-wrap: balance;
+  }
 }
 
 h3,
@@ -200,13 +212,19 @@ p {
  * specificity inside the layer could win. Excluding buttons from the reset
  * lets each variant own its own colour.
  */
-a:not(.aw-btn) {
-  color: inherit;
-  text-decoration: none;
-}
-
-a.aw-btn {
-  text-decoration: none;
+/*
+ * Now inside @layer base, which retires the `:not(.aw-btn)` workaround's
+ * whole category of bug. Unlayered, this reset beat every utility too — so a
+ * <Link className="text-white"> in the dark hero band still inherited ink and
+ * the family chips were invisible. In the base layer the reset is still the
+ * default for every link, but any utility or component rule wins over it,
+ * which is the normal, expected order.
+ */
+@layer base {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 img,
@@ -227,14 +245,17 @@ video {
  * inherited body's ink colour and .aw-btn-primary could never win. Buttons
  * still inherit `font`; only the colour is left to each variant.
  */
-button:not(.aw-btn),
-input,
-select,
-textarea {
-  font: inherit;
-  color: inherit;
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
 }
 
+/* Kept for buttons that override `font` deliberately; harmless otherwise. */
 button.aw-btn {
   /*
    * font-FAMILY only, never the `font` shorthand.

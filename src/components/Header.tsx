@@ -84,6 +84,30 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-1 sm:gap-2">
+            {/* Search is the fastest way into an 83-item catalogue; it sits in
+                the header on every page, not only on the shop. */}
+            <form action="/shop" method="get" role="search" className="hidden md:block">
+              <label htmlFor="header-search" className="sr-only">
+                Search attars
+              </label>
+              <input
+                id="header-search"
+                name="search"
+                type="search"
+                placeholder="Search attars…"
+                className="aw-field h-10 w-44 rounded-full px-4 py-0 text-sm lg:w-56"
+              />
+            </form>
+            <Link
+              href="/shop"
+              aria-label="Search"
+              className="flex h-10 w-10 items-center justify-center text-ink transition-colors hover:text-brand md:hidden"
+            >
+              <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="5.4" stroke="currentColor" strokeWidth="1.6" />
+                <path d="M13.2 13.2 17 17" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+            </Link>
             <CartButton />
 
             <button

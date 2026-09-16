@@ -86,10 +86,10 @@ function mockProductPage(query: ProductQuery): Paginated<ProductSummary> {
 
   switch (query.sort) {
     case 'price_asc':
-      items.sort((a, b) => a.minPricePaise - b.minPricePaise);
+      items.sort((a, b) => (a.fromPricePaise ?? a.minPricePaise ?? 0) - (b.fromPricePaise ?? b.minPricePaise ?? 0));
       break;
     case 'price_desc':
-      items.sort((a, b) => b.minPricePaise - a.minPricePaise);
+      items.sort((a, b) => (b.fromPricePaise ?? b.minPricePaise ?? 0) - (a.fromPricePaise ?? a.minPricePaise ?? 0));
       break;
     case 'name':
       items.sort((a, b) => a.name.localeCompare(b.name));
