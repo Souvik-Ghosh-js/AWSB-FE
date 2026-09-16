@@ -367,11 +367,74 @@ export async function getFeaturedProducts(limit = 6): Promise<ProductSummary[]> 
  * Re-price and stock-check the cart. The server is the only authority on
  * price — localStorage is shopper-editable and must never be trusted.
  */
-export function validateCart(items: CartLineInput[]): Promise<CartValidation> {
-  return apiRequest<CartValidation>('/cart/validate', {
+export async function validateCart(items: CartLineInput[]): Promise<CartValidation> {
+  const raw = await apiRequest<Record<string, unknown>>('/cart/validate', {
     method: 'POST',
     body: { items },
   });
+  return normaliseCartValidation(raw);
+}
+
+type ValidatedLine = CartValidation['items'][number];
+type Adjustment = CartValidation['adjustments'][number];
+
+const ISSUE_MESSAGE: Record<string, { type: Adjustment['type']; text: (name: string) => string }> = {
+  unavailable: { type: 'removed', text: (n) => `${n} is no longer available and was removed.` },
+  out_of_stock: { type: 'out_of_stock', text: (n) => `${n} has sold out and was removed.` },
+  quantity_reduced: { type: 'quantity_clamped', text: (n) => `Only limited stock of ${n} is left, so the quantity was reduced.` },
+};
+
+/**
+ * The live API answers POST /cart/validate with MySQL's shapes leaking through:
+ * `variantId` is a string ("247"), the stock field is `availableQty`, and
+ * problems arrive as per-line `issues: ['out_of_stock']` plus a top-level
+ * `hasIssues` rather than an `adjustments` list. The cart code keys a Map by
+ * numeric variantId and reads `availableQuantity`, so before this normaliser
+ * every line looked sold out and the cart emptied itself on open. Verified
+ * against the live server on 2026-09-16.
+ */
+function normaliseCartValidation(raw: Record<string, unknown>): CartValidation {
+  const rawItems = Array.isArray(raw.items) ? (raw.items as Record<string, unknown>[]) : [];
+  const adjustments: Adjustment[] = Array.isArray(raw.adjustments)
+    ? (raw.adjustments as Adjustment[]).map((a) => ({ ...a, variantId: Number(a.variantId) }))
+    : [];
+
+  const lines: ValidatedLine[] = rawItems.map((i) => {
+    const variantId = Number(i.variantId);
+    const name = String(i.productName ?? 'An item');
+    const sizeMl = Number(i.sizeMl ?? 0);
+    const label = sizeMl ? `${name} ${sizeMl}ml` : name;
+    const availableQuantity = Number(i.availableQuantity ?? i.availableQty ?? 0);
+    const issues = Array.isArray(i.issues) ? (i.issues as string[]) : [];
+
+    for (const code of issues) {
+      const known = ISSUE_MESSAGE[code];
+      if (known && !adjustments.some((a) => a.variantId === variantId && a.type === known.type)) {
+        adjustments.push({ variantId, type: known.type, message: known.text(label) });
+      }
+    }
+
+    return {
+      variantId,
+      productId: Number(i.productId ?? 0),
+      productName: name,
+      productSlug: String(i.productSlug ?? ''),
+      sizeMl,
+      sku: String(i.sku ?? ''),
+      unitPricePaise: Number(i.unitPricePaise ?? 0),
+      quantity: Number(i.quantity ?? 0),
+      availableQuantity,
+      inStock: availableQuantity > 0,
+      lineTotalPaise: Number(i.lineTotalPaise ?? 0),
+      imageUrl: typeof i.imageUrl === 'string' ? i.imageUrl : null,
+    };
+  });
+
+  return {
+    items: lines,
+    subtotalPaise: Number(raw.subtotalPaise ?? 0),
+    adjustments,
+  };
 }
 
 export function validateCoupon(
