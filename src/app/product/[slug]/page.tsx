@@ -119,6 +119,15 @@ export default async function ProductPage({
       <div className="mt-7 grid gap-10 lg:grid-cols-12 lg:gap-14">
         <div className="lg:col-span-7">
           <ProductGallery images={product.images} productName={product.name} />
+
+          {/* A distinct, labelled note under the photos themselves — not
+              buried in the generic Assurances list — since this is a claim
+              about the images specifically. Full wording in Terms §2. */}
+          <p className="mt-4 text-[0.75rem] leading-relaxed text-muted">
+            <strong className="text-ink">Image disclaimer:</strong> photos are
+            representative and may be stylised or AI-generated. The bottle, label and
+            packaging you receive may differ slightly from what is shown here.
+          </p>
         </div>
 
         <div className="lg:col-span-5">
@@ -187,10 +196,6 @@ export default async function ProductPage({
               `₹${SHOP.shipping.kolkataPaise / 100} shipping in Kolkata · ₹${
                 SHOP.shipping.restOfIndiaPaise / 100
               } elsewhere`,
-              // Sits with the other honest, practical disclosures here rather
-              // than a separate alarmist warning box — this is routine, not
-              // exceptional. See Terms & Conditions §2 for the full wording.
-              'Bottle, label and packaging may vary slightly from the image shown',
             ].map((line) => (
               <li key={line} className="flex gap-2.5 text-[0.8125rem] text-muted">
                 <span aria-hidden="true" className="text-accent">
