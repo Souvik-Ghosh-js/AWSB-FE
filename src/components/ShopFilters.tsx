@@ -56,7 +56,7 @@ export function ShopFilters({
             aria-pressed={!activeCategory}
             className={`shrink-0 border px-4 py-2 text-[0.75rem] tracking-[0.06em] whitespace-nowrap transition-colors ${
               !activeCategory
-                ? 'border-brand bg-brand text-[#f7f4ea]'
+                ? 'border-brand bg-brand text-white'
                 : 'border-line-strong text-ink hover:border-brand hover:text-brand'
             }`}
           >
@@ -71,7 +71,7 @@ export function ShopFilters({
               aria-pressed={activeCategory === category.slug}
               className={`shrink-0 border px-4 py-2 text-[0.75rem] tracking-[0.06em] whitespace-nowrap transition-colors ${
                 activeCategory === category.slug
-                  ? 'border-brand bg-brand text-[#f7f4ea]'
+                  ? 'border-brand bg-brand text-white'
                   : 'border-line-strong text-ink hover:border-brand hover:text-brand'
               }`}
             >

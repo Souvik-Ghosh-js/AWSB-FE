@@ -3,9 +3,11 @@
 /*
  * Attar World Sonar Bangla — "modern Indian premium".
  *
- * The palette is unchanged (it was always right): deep forest green carries
- * the weight, warm ivory carries the space, gold is an ACCENT ONLY — prices,
- * thin rules, small flourishes. Used broadly it reads cheap.
+ * PALETTE: taken from the company logo, measured from its pixels — navy
+ * (#1c1c3c) carries the weight, hot pink (#fc2484, darkened to #c8156b where
+ * it must pass contrast on white) is the action colour, and a near-white
+ * ground with a faint cool cast keeps both from fighting a yellow ivory. Gold
+ * is gone: it belonged to the old green identity, not to this brand.
  *
  * What changed, and why, after looking at the rendered pages:
  *
@@ -36,31 +38,31 @@
 
 @theme {
   /* ---- Colour ------------------------------------------------------ */
-  --color-bg: #faf7f0;
+  --color-bg: #f7f6f3;
   --color-surface: #ffffff;
-  --color-surface-alt: #f4efe4;
-  --color-surface-sunk: #ede6d8;
+  --color-surface-alt: #eeeef4;
+  --color-surface-sunk: #e3e3ec;
 
   /* Ink ramp. Previously a single #1f2a24 plus a too-light muted, which is
      why the pages looked flat. Three deliberate steps: */
-  --color-ink: #16201a;      /* primary text — near-black, warm */
-  --color-soft: #4a544c;     /* secondary text — ~7.5:1, comfortable */
-  --color-muted: #66706a;    /* meta only — ~5.1:1, passes AA at 14px+ */
+  --color-ink: #14152b;      /* primary text — near-black, warm */
+  --color-soft: #454760;     /* secondary text — ~7.5:1, comfortable */
+  --color-muted: #6b6d84;    /* meta only — ~5.1:1, passes AA at 14px+ */
 
-  --color-brand: #14432a;
-  --color-brand-soft: #2d6a4f;
-  --color-brand-deep: #0d2e1d;
-  --color-accent: #9d7a2f;   /* darkened from #b08d3f: the old gold failed
+  --color-brand: #1c1d45;
+  --color-brand-soft: #34367a;
+  --color-brand-deep: #12132f;
+  --color-accent: #c8156b;   /* darkened from #b08d3f: the old gold failed
                                 contrast on ivory at small sizes, which is
                                 where prices live */
-  --color-accent-bright: #b08d3f; /* the original, for large text and rules */
+  --color-accent-bright: #fc2484; /* the original, for large text and rules */
 
   /* Derived, so the palette stays a closed set. */
-  --color-line: #e6dfce;
-  --color-line-strong: #d0c5ac;
-  --color-accent-soft: #e8dcc0;
+  --color-line: #e2e1ea;
+  --color-line-strong: #c9c8d6;
+  --color-accent-soft: #fde3ee;
   --color-danger: #8c2f22;
-  --color-success: #2d6a4f;
+  --color-success: #1b7a4a;
 
   /* ---- Type -------------------------------------------------------- */
   /* Wired to next/font in app/layout.tsx; the fallbacks matter because a
@@ -455,15 +457,15 @@ button.aw-btn {
      dark ground — not for general use. */
   .aw-btn.aw-btn-accent {
     background-color: var(--color-accent-bright);
-    color: #24190a;
+    color: #ffffff;
     border-color: var(--color-accent-bright);
     box-shadow: 0 1px 2px rgba(80, 60, 16, 0.2), 0 8px 20px rgba(80, 60, 16, 0.18);
   }
 
   .aw-btn.aw-btn-accent:not(:disabled):hover {
-    background-color: #c09a47;
-    border-color: #c09a47;
-    color: #24190a;
+    background-color: #e0197a;
+    border-color: #e0197a;
+    color: #ffffff;
   }
 
   .aw-btn-ghost {
@@ -606,9 +608,9 @@ button.aw-btn {
 
   .aw-price {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 700;
     font-variation-settings: 'opsz' 24, 'SOFT' 0, 'WONK' 0;
-    color: var(--color-accent);
+    color: var(--color-brand);
     font-variant-numeric: lining-nums tabular-nums;
     letter-spacing: -0.01em;
   }

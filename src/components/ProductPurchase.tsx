@@ -87,7 +87,7 @@ export function ProductPurchase({ product }: { product: ProductDetail }) {
         ) : null}
 
         {saving ? (
-          <span className="aw-badge bg-[color-mix(in_srgb,var(--color-accent)_16%,transparent)] text-[#8a6c26]">
+          <span className="aw-badge bg-[color-mix(in_srgb,var(--color-accent)_16%,transparent)] text-accent">
             Save {saving}%
           </span>
         ) : null}

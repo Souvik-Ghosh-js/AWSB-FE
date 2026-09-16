@@ -50,7 +50,7 @@ export function Header() {
           The full sentence does not fit on a phone — it used to be clipped
           mid-word ("Delivered a…"), so the middle claim is dropped at small
           widths rather than truncated. */}
-      <div className="bg-brand-deep text-[#e9e3d4]">
+      <div className="bg-brand-deep text-[#e8e7f3]">
         <div className="aw-container flex min-h-9 items-center justify-center py-2 text-center">
           <p className="text-2xs tracking-[0.06em] sm:text-xs">
             Hand-decanted in Rajarhat

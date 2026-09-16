@@ -185,7 +185,7 @@ export function StockBadge({
   }
   if (isLowStock) {
     return (
-      <span className="aw-badge bg-[color-mix(in_srgb,var(--color-accent)_14%,transparent)] text-[#8a6c26]">
+      <span className="aw-badge bg-[color-mix(in_srgb,var(--color-accent)_14%,transparent)] text-accent">
         <Dot className="bg-accent" />
         Only a few left
       </span>
@@ -208,7 +208,7 @@ export function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     pending_payment: 'bg-surface-alt text-muted',
     confirmed: 'bg-[color-mix(in_srgb,var(--color-brand-soft)_14%,transparent)] text-brand',
-    packed: 'bg-[color-mix(in_srgb,var(--color-accent)_16%,transparent)] text-[#8a6c26]',
+    packed: 'bg-[color-mix(in_srgb,var(--color-accent)_16%,transparent)] text-accent',
     shipped: 'bg-[color-mix(in_srgb,var(--color-brand-soft)_18%,transparent)] text-brand-soft',
     delivered: 'bg-[color-mix(in_srgb,var(--color-brand)_14%,transparent)] text-brand',
     cancelled: 'bg-[color-mix(in_srgb,var(--color-danger)_10%,transparent)] text-danger',

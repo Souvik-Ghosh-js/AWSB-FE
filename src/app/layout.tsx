@@ -89,7 +89,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#14432A',
+  themeColor: '#12132f',
   colorScheme: 'light',
 };
 
@@ -103,7 +103,7 @@ export default function RootLayout({
             reach a long checkout form. */}
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[60] focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:text-[#f7f4ea]"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[60] focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:text-white"
         >
           Skip to content
         </a>

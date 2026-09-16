@@ -174,7 +174,7 @@ function Pagination({
               aria-current={p === page ? 'page' : undefined}
               className={`flex h-9 min-w-9 items-center justify-center px-2.5 text-[0.8125rem] transition-colors ${
                 p === page
-                  ? 'border border-brand bg-brand text-[#f7f4ea]'
+                  ? 'border border-brand bg-brand text-white'
                   : 'border border-line-strong text-ink hover:border-brand hover:text-brand'
               }`}
             >

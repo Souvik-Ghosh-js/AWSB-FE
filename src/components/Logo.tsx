@@ -1,44 +1,36 @@
-/**
- * The house mark: a bottle inside a gold-ruled lozenge.
- *
- * Drawn rather than imported so it stays crisp at any size, inherits
- * currentColor for the linework, and adds no network request to the header.
- */
+import Image from 'next/image';
 
-export function LogoMark({ className = '' }: { className?: string }) {
+/**
+ * The company mark, from the owner's own logo file.
+ *
+ * `LogoMark` is the circle monogram — the navy ring with the W and the pink
+ * flame — cropped from the full logo. It is what sits in the header, the
+ * favicon and anywhere the mark must read at 32-48px. The full logo, with the
+ * bottle and the paisley flourish beneath, is `/img/logo-full.png`, used
+ * where there is room to show it large.
+ *
+ * A raster, not an SVG: the source is the owner's artwork, and redrawing it
+ * would put my hand on their brand. Served from /public so it is one cached
+ * request, and `priority` in the header so it is never the last thing to
+ * paint.
+ */
+export function LogoMark({
+  className = '',
+  priority = false,
+}: {
+  className?: string;
+  priority?: boolean;
+}) {
   return (
-    <svg
-      viewBox="0 0 48 48"
+    <Image
+      src="/img/logo-mark.png"
+      alt=""
       aria-hidden="true"
-      focusable="false"
+      width={512}
+      height={512}
+      priority={priority}
       className={className}
-      fill="none"
-    >
-      {/* Lozenge frame */}
-      <path
-        d="M24 2 L44 24 L24 46 L4 24 Z"
-        stroke="currentColor"
-        strokeWidth="1"
-        opacity="0.35"
-      />
-      <path
-        d="M24 7 L39 24 L24 41 L9 24 Z"
-        stroke="var(--color-accent)"
-        strokeWidth="0.9"
-      />
-      {/* Bottle */}
-      <rect x="21.5" y="13" width="5" height="3.4" rx="0.6" fill="var(--color-accent)" />
-      <path
-        d="M19.6 17.8 h8.8 a1.6 1.6 0 0 1 1.6 1.6 v9.4 a3.2 3.2 0 0 1 -3.2 3.2 h-5.6 a3.2 3.2 0 0 1 -3.2 -3.2 v-9.4 a1.6 1.6 0 0 1 1.6 -1.6 z"
-        stroke="currentColor"
-        strokeWidth="1.1"
-      />
-      <path
-        d="M20 24.4 h8 v4.4 a2.6 2.6 0 0 1 -2.6 2.6 h-2.8 a2.6 2.6 0 0 1 -2.6 -2.6 z"
-        fill="var(--color-accent)"
-        opacity="0.55"
-      />
-    </svg>
+    />
   );
 }
 
@@ -49,22 +41,27 @@ export function LogoMark({ className = '' }: { className?: string }) {
 export function Logo({
   className = '',
   stacked = false,
+  priority = false,
 }: {
   className?: string;
   stacked?: boolean;
+  priority?: boolean;
 }) {
   return (
     <span
       className={[
         'inline-flex items-center text-brand',
-        stacked ? 'flex-col gap-2.5 text-center' : 'gap-2.5 sm:gap-3',
+        stacked ? 'flex-col gap-3 text-center' : 'gap-2.5 sm:gap-3',
         className,
       ].join(' ')}
     >
-      <LogoMark className={stacked ? 'h-11 w-11 shrink-0' : 'h-8 w-8 shrink-0 sm:h-9 sm:w-9'} />
+      <LogoMark
+        priority={priority}
+        className={stacked ? 'h-14 w-14 shrink-0' : 'h-10 w-10 shrink-0 sm:h-11 sm:w-11'}
+      />
       <span className={stacked ? 'flex flex-col items-center' : 'flex flex-col'}>
         <span
-          className="font-[family-name:var(--font-display)] text-[1.0625rem] leading-none font-medium tracking-[0.01em] sm:text-xl"
+          className="font-[family-name:var(--font-display)] text-[1.125rem] leading-none font-bold tracking-[-0.01em] sm:text-[1.25rem]"
           style={{ fontVariantNumeric: 'lining-nums' }}
         >
           Attar World

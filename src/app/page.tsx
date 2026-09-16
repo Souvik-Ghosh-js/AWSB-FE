@@ -121,7 +121,7 @@ function Band({
       <div
         aria-hidden="true"
         className="absolute inset-0"
-        style={{ background: 'linear-gradient(90deg, rgba(13,46,29,0.96) 0%, rgba(13,46,29,0.80) 100%)' }}
+        style={{ background: 'linear-gradient(90deg, rgba(18,19,47,0.96) 0%, rgba(18,19,47,0.82) 100%)' }}
       />
 
       <div className="aw-container relative py-12 sm:py-16">
@@ -251,7 +251,7 @@ function Families({ families }: { families: { name: string; count: number }[] })
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-0"
-              style={{ background: 'linear-gradient(180deg, transparent 40%, rgba(13,46,29,0.88) 100%)' }}
+              style={{ background: 'linear-gradient(180deg, transparent 40%, rgba(18,19,47,0.90) 100%)' }}
             />
             <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-4">
               <p className="aw-display text-xl text-white">{f.name}</p>
