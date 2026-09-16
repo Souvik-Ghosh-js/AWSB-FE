@@ -187,6 +187,10 @@ export default async function ProductPage({
               `₹${SHOP.shipping.kolkataPaise / 100} shipping in Kolkata · ₹${
                 SHOP.shipping.restOfIndiaPaise / 100
               } elsewhere`,
+              // Sits with the other honest, practical disclosures here rather
+              // than a separate alarmist warning box — this is routine, not
+              // exceptional. See Terms & Conditions §2 for the full wording.
+              'Bottle, label and packaging may vary slightly from the image shown',
             ].map((line) => (
               <li key={line} className="flex gap-2.5 text-[0.8125rem] text-muted">
                 <span aria-hidden="true" className="text-accent">

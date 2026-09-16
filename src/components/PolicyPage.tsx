@@ -14,7 +14,7 @@ import { SHOP } from '@/lib/shop';
  * a policy that silently claims to have been updated today, every day, is
  * worse than useless in a dispute.
  */
-export const POLICY_LAST_UPDATED = '14 September 2026';
+export const POLICY_LAST_UPDATED = '16 September 2026';
 
 export function PolicyPage({
   title,

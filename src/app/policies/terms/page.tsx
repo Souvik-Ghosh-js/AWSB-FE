@@ -42,6 +42,14 @@ export default function TermsPage() {
         is not a defect.
       </p>
       <p>
+        <strong>Product images.</strong> We photograph our own stock wherever we can, but
+        some images on this site may be representative, stylised or AI-generated rather
+        than a photograph of the exact bottle you will receive. The label design, cap
+        colour, bottle shape and outer packaging of the item delivered to you may differ
+        from what is shown on the product page. This does not affect the fragrance,
+        volume or quality of what you ordered.
+      </p>
+      <p>
         Our products are cosmetic goods for external use on the skin. They are not
         medicines and make no therapeutic claim. If you have sensitive skin or a known
         fragrance allergy, test a small amount on your inner arm first. Keep all bottles
