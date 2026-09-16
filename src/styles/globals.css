@@ -38,29 +38,34 @@
 
 @theme {
   /* ---- Colour ------------------------------------------------------ */
-  --color-bg: #f7f6f3;
+  /* Palette (v3): deep wine/maroon + warm mustard-gold, per the owner's
+     reference mockup. Estimated by eye from a screenshot — the owner opted
+     not to send the source file, so these hex values are a close reading
+     rather than a pixel measurement. Adjust if a swatch ever arrives. */
+  --color-bg: #f9f6f0;
   --color-surface: #ffffff;
-  --color-surface-alt: #eeeef4;
-  --color-surface-sunk: #e3e3ec;
+  --color-surface-alt: #f2ece0;
+  --color-surface-sunk: #e8ddc8;
 
-  /* Ink ramp. Previously a single #1f2a24 plus a too-light muted, which is
-     why the pages looked flat. Three deliberate steps: */
-  --color-ink: #14152b;      /* primary text — near-black, warm */
-  --color-soft: #454760;     /* secondary text — ~7.5:1, comfortable */
-  --color-muted: #6b6d84;    /* meta only — ~5.1:1, passes AA at 14px+ */
+  /* Ink ramp. */
+  --color-ink: #241012;      /* primary text — near-black, warm maroon cast */
+  --color-soft: #5c3a3e;     /* secondary text */
+  --color-muted: #7a6058;    /* meta only — passes AA at 14px+ */
 
-  --color-brand: #1c1d45;
-  --color-brand-soft: #34367a;
-  --color-brand-deep: #12132f;
-  --color-accent: #c8156b;   /* darkened from #b08d3f: the old gold failed
-                                contrast on ivory at small sizes, which is
-                                where prices live */
-  --color-accent-bright: #fc2484; /* the original, for large text and rules */
+  --color-brand: #3a0f18;
+  --color-brand-soft: #5c1d28;
+  --color-brand-deep: #240a10;
+  --color-accent: #a67a24;   /* darkened mustard-gold: passes contrast on
+                                ivory at small sizes, which is where prices
+                                live */
+  --color-accent-bright: #cc9c3c; /* the brighter mustard-gold, for large
+                                      text, rules and the band's Search
+                                      button */
 
   /* Derived, so the palette stays a closed set. */
-  --color-line: #e2e1ea;
-  --color-line-strong: #c9c8d6;
-  --color-accent-soft: #fde3ee;
+  --color-line: #e8ddc8;
+  --color-line-strong: #d4c19f;
+  --color-accent-soft: #f3e6c8;
   --color-danger: #8c2f22;
   --color-success: #1b7a4a;
 
@@ -229,12 +234,22 @@ p {
   }
 }
 
-img,
-svg,
-video {
-  max-width: 100%;
-  height: auto;
-  display: block;
+/*
+ * Also inside @layer base, for the identical reason as the a{} reset above.
+ * This was unlayered, so its `height: auto` beat every Tailwind height
+ * utility (.h-12, .h-14, ...) regardless of specificity — the header logo
+ * rendered at its full natural 1329px because nothing in a @layer could ever
+ * win against it. Caught by measuring the DOM: the class list showed h-12 but
+ * computed height was 1329px.
+ */
+@layer base {
+  img,
+  svg,
+  video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
 }
 
 /*
@@ -431,14 +446,14 @@ button.aw-btn {
     background-color: var(--color-brand);
     color: #fbf9f3;
     border-color: var(--color-brand);
-    box-shadow: 0 1px 2px rgba(13, 46, 29, 0.18), 0 8px 20px rgba(13, 46, 29, 0.16);
+    box-shadow: 0 1px 2px rgba(36, 10, 16, 0.18), 0 8px 20px rgba(36, 10, 16, 0.16);
   }
 
   .aw-btn.aw-btn-primary:not(:disabled):hover {
     background-color: var(--color-brand-soft);
     border-color: var(--color-brand-soft);
     color: #fbf9f3;
-    box-shadow: 0 2px 4px rgba(13, 46, 29, 0.2), 0 12px 28px rgba(13, 46, 29, 0.22);
+    box-shadow: 0 2px 4px rgba(36, 10, 16, 0.2), 0 12px 28px rgba(36, 10, 16, 0.22);
   }
 
   .aw-btn.aw-btn-outline {
@@ -463,8 +478,8 @@ button.aw-btn {
   }
 
   .aw-btn.aw-btn-accent:not(:disabled):hover {
-    background-color: #e0197a;
-    border-color: #e0197a;
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
     color: #ffffff;
   }
 

@@ -33,7 +33,7 @@ export type PhotoProps = {
 
 /** Deterministic tint per label, so a product keeps the same colour everywhere. */
 const TINTS = [
-  { from: '#2b2d66', to: '#12132f' }, // navy — the brand's own
+  { from: '#5c1d28', to: '#240a10' }, // maroon — the brand's own
   { from: '#6b4d1f', to: '#3d2a10' }, // amber
   { from: '#5a3340', to: '#32202a' }, // rose
   { from: '#2c4a52', to: '#16292e' }, // teal

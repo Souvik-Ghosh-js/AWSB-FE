@@ -3,17 +3,20 @@ import Image from 'next/image';
 /**
  * The company mark, from the owner's own logo file.
  *
- * `LogoMark` is the circle monogram — the navy ring with the W and the pink
- * flame — cropped from the full logo. It is what sits in the header, the
- * favicon and anywhere the mark must read at 32-48px. The full logo, with the
- * bottle and the paisley flourish beneath, is `/img/logo-full.png`, used
- * where there is room to show it large.
+ * Shows the FULL artwork — ring, monogram, bottle and paisley flourish — not
+ * a cropped circle. The source PNG is 1080x1329 (0.81:1, tall portrait), so
+ * `LogoMark` is sized by height and lets width follow the aspect ratio,
+ * rather than being forced into a square box that would either crop it or
+ * leave empty padding.
  *
  * A raster, not an SVG: the source is the owner's artwork, and redrawing it
  * would put my hand on their brand. Served from /public so it is one cached
  * request, and `priority` in the header so it is never the last thing to
  * paint.
  */
+const LOGO_W = 1080;
+const LOGO_H = 1329;
+
 export function LogoMark({
   className = '',
   priority = false,
@@ -23,13 +26,14 @@ export function LogoMark({
 }) {
   return (
     <Image
-      src="/img/logo-mark.png"
+      src="/img/logo-full.png"
       alt=""
       aria-hidden="true"
-      width={512}
-      height={512}
+      width={LOGO_W}
+      height={LOGO_H}
       priority={priority}
       className={className}
+      style={{ width: 'auto' }}
     />
   );
 }
@@ -57,7 +61,7 @@ export function Logo({
     >
       <LogoMark
         priority={priority}
-        className={stacked ? 'h-14 w-14 shrink-0' : 'h-10 w-10 shrink-0 sm:h-11 sm:w-11'}
+        className={stacked ? 'h-20 w-auto shrink-0' : 'h-12 w-auto shrink-0 sm:h-14'}
       />
       <span className={stacked ? 'flex flex-col items-center' : 'flex flex-col'}>
         <span

@@ -121,9 +121,9 @@ export function loadRazorpayCheckout(): Promise<void> {
   return loaderPromise;
 }
 
-/** Brand theme for the Razorpay modal — deep forest, matching the site. */
+/** Brand theme for the Razorpay modal — maroon, matching the site. */
 export const RAZORPAY_THEME = {
-  color: '#1c1d45',
+  color: '#3a0f18',
   backdrop_color: 'rgba(31, 42, 36, 0.72)',
 } as const;
 
