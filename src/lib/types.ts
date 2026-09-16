@@ -118,8 +118,14 @@ export interface ProductDetail extends ProductSummary {
   images: ProductImage[];
   /** 3ml / 6ml / 12ml, each with its own price and stock. */
   variants: Variant[];
-  categories: Category[];
-  reviews: Review[];
+  /**
+   * Optional: the live API omits this entirely when a product has no
+   * category assignments — which today is every product. Typing it as
+   * required let `product.categories[0]` compile and then crash the Netlify
+   * prerender of every product page.
+   */
+  categories?: Category[];
+  reviews?: Review[];
 }
 
 /* -------------------------------------------------------------- reviews */

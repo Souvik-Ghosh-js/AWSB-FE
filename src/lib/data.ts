@@ -68,7 +68,7 @@ function mockProductPage(query: ProductQuery): Paginated<ProductSummary> {
     const slug = query.category;
     const ids = new Set(
       mockProducts
-        .filter((p) => p.categories.some((c) => c.slug === slug))
+        .filter((p) => (p.categories ?? []).some((c) => c.slug === slug))
         .map((p) => p.id)
     );
     items = items.filter((p) => ids.has(p.id));

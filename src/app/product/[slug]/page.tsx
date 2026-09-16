@@ -97,12 +97,16 @@ export default async function ProductPage({
         items={[
           { href: '/', label: 'Home' },
           { href: '/shop', label: 'Shop' },
+          // Link the family crumb by search, not by category. Products are
+          // not assigned to categories (the API omits `categories` entirely,
+          // and `product.categories[0]` crashed the prerender of every product
+          // page on Netlify). Search matches scent_family, so this crumb
+          // actually lands on the family's products — the same link the home
+          // page chips use.
           ...(product.scentFamily
             ? [
                 {
-                  href: `/shop?category=${encodeURIComponent(
-                    product.categories[0]?.slug ?? ''
-                  )}`,
+                  href: `/shop?search=${encodeURIComponent(product.scentFamily)}`,
                   label: product.scentFamily,
                 },
               ]
