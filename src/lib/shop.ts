@@ -43,7 +43,7 @@ export const SHOP = {
     deliveryIndia: '4–8 business days',
   },
 
-  /** Returns window, quoted on the refund policy and the product page. */
+  /** Days after delivery within which a damaged-item replacement claim must be raised. */
   returnWindowDays: 7,
 
   /** Stock is held this long while payment completes. Mirrors RESERVATION_MINUTES. */
@@ -64,7 +64,7 @@ export const NAV_LINKS = [
 export const POLICY_LINKS = [
   { href: '/policies/terms', label: 'Terms & Conditions' },
   { href: '/policies/privacy', label: 'Privacy Policy' },
-  { href: '/policies/refund', label: 'Refund & Cancellation' },
+  { href: '/policies/refund', label: 'Refund & Replacement' },
   { href: '/policies/shipping', label: 'Shipping Policy' },
 ] as const;
 

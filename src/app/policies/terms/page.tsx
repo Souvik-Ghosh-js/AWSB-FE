@@ -94,9 +94,17 @@ export default function TermsPage() {
         the reservation is released and the items return to general stock.
       </p>
       <p>
-        We may decline or cancel an order, and refund you in full, if: the item is out of
-        stock; the listed price or description was materially wrong; we cannot deliver to
-        your address; or we reasonably believe the order is fraudulent.
+        <strong>Once payment has been made an order cannot be cancelled by you</strong>,
+        because we do not offer refunds (see section 6). Please check your items, sizes and
+        address before paying.
+      </p>
+      <p>
+        We may decline or cancel an order ourselves if: the item is out of stock; the
+        listed price or description was materially wrong; we cannot deliver to your
+        address; or we reasonably believe the order is fraudulent. In that case we offer a
+        replacement of equal value or, where none is possible, return the amount paid to
+        the original payment method. This is the only circumstance in which money is
+        returned.
       </p>
 
       <h2>5. Your address</h2>
@@ -108,16 +116,41 @@ export default function TermsPage() {
       </p>
       <p>
         If a parcel is returned to us because the address was wrong or incomplete, or
-        because nobody was available to receive it after the courier&rsquo;s attempts, we
-        will refund the value of the goods but not the original shipping charge. Re-
-        despatch is charged at the normal shipping rate.
+        because nobody was available to receive it after the courier&rsquo;s attempts,{' '}
+        <strong>no refund is made</strong>. We will contact you to arrange re-despatch,
+        which is charged at the normal shipping rate.
       </p>
 
-      <h2>6. Cancellation, returns and refunds</h2>
+      <h2>6. No refunds; replacement of damaged items</h2>
       <p>
-        These are set out in full in our{' '}
-        <Link href="/policies/refund">Refund &amp; Cancellation Policy</Link>, which forms
-        part of these terms.
+        <strong>
+          We do not offer refunds. No product is refunded, in full or in part, for any
+          reason, and a paid order cannot be cancelled.
+        </strong>{' '}
+        Our only remedy is the replacement of an item that arrived damaged in transit.
+      </p>
+      <p>
+        A replacement claim is accepted only if all of the following are met:
+      </p>
+      <ul>
+        <li>the item was damaged on arrival — broken, cracked or leaking when delivered;</li>
+        <li>
+          the claim is supported by one continuous, unedited video that begins before the
+          sealed parcel is opened, shows the courier label, and runs until the damage is
+          clearly shown;
+        </li>
+        <li>
+          you first submit a complaint through our <Link href="/contact">Contact page</Link>{' '}
+          and receive a complaint ID, and then email the video to{' '}
+          <a href={`mailto:${SHOP.email}`}>{SHOP.email}</a> quoting that complaint ID;
+        </li>
+        <li>the claim is raised within {SHOP.returnWindowDays} days of delivery.</li>
+      </ul>
+      <p>
+        Claims that do not meet every condition are declined. An accepted claim is settled
+        by replacement only and is never converted into a refund. The full procedure is in
+        our <Link href="/policies/refund">Refund, Cancellation &amp; Replacement Policy</Link>,
+        which forms part of these terms.
       </p>
 
       <h2>7. Reviews and submissions</h2>

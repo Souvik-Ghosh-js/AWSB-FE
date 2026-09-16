@@ -110,17 +110,23 @@ export default function ShippingPolicyPage() {
       </p>
       <p>
         If both attempts fail, the parcel is returned to us. We will contact you to
-        arrange re-despatch, which is charged at the normal shipping rate. Refunds in that
-        situation are covered by our{' '}
-        <Link href="/policies/refund">Refund &amp; Cancellation Policy</Link>.
+        arrange re-despatch, which is charged at the normal shipping rate. No refund is
+        made for a returned parcel — see our{' '}
+        <Link href="/policies/refund">Refund, Cancellation &amp; Replacement Policy</Link>.
       </p>
 
       <h2>7. How we pack</h2>
       <p>
         Attar bottles are glass and India is hot. Every bottle is sealed, wrapped and
-        boxed with cushioning for the journey. If a parcel nevertheless arrives damaged or
-        leaking, photograph it before unpacking further and contact us within{' '}
-        {SHOP.returnWindowDays} days — we will replace or refund it in full.
+        boxed with cushioning for the journey.{' '}
+        <strong>
+          Please record a continuous video of every parcel from before you open it
+        </strong>
+        : if an item arrives damaged or leaking, that unboxing video is required for a
+        replacement. Submit a complaint on our <Link href="/contact">Contact page</Link>{' '}
+        within {SHOP.returnWindowDays} days, then email the video quoting your complaint
+        ID. We replace damaged items; we do not refund. Full details are in our{' '}
+        <Link href="/policies/refund">Refund, Cancellation &amp; Replacement Policy</Link>.
       </p>
 
       <h2>8. Wrong or incomplete addresses</h2>

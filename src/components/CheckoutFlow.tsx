@@ -658,7 +658,7 @@ export function CheckoutFlow() {
             </Link>
             ,{' '}
             <Link href="/policies/refund" className="underline underline-offset-4">
-              Refund &amp; Cancellation Policy
+              Refund, Cancellation &amp; Replacement Policy
             </Link>{' '}
             and{' '}
             <Link href="/policies/shipping" className="underline underline-offset-4">

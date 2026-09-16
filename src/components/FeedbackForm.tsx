@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { ApiError, submitFeedback } from '@/lib/api';
+import { SHOP } from '@/lib/shop';
 import { isValidEmail } from '@/lib/validation';
 
 /**
@@ -21,6 +22,7 @@ export function FeedbackForm() {
 
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [complaintId, setComplaintId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const submit = async () => {
@@ -37,7 +39,7 @@ export function FeedbackForm() {
     setError(null);
 
     try {
-      await submitFeedback({
+      const result = await submitFeedback({
         ...(name.trim() ? { name: name.trim() } : {}),
         ...(email.trim() ? { email: email.trim() } : {}),
         ...(subject.trim() ? { subject: subject.trim() } : {}),
@@ -45,6 +47,7 @@ export function FeedbackForm() {
         message: message.trim(),
       });
 
+      setComplaintId(typeof result?.id === 'number' ? result.id : null);
       setSent(true);
       setName('');
       setEmail('');
@@ -72,6 +75,25 @@ export function FeedbackForm() {
           ✓
         </span>
         <h2 className="mt-5 text-2xl">Thank you — your message is with us</h2>
+        {complaintId !== null ? (
+          <>
+            <p className="mx-auto mt-4 max-w-sm text-[0.875rem] leading-relaxed text-muted">
+              Your complaint ID is
+            </p>
+            <p className="mt-1 font-mono text-2xl tracking-wide text-ink">
+              #{complaintId}
+            </p>
+            <p className="mx-auto mt-4 max-w-md text-[0.875rem] leading-relaxed text-muted">
+              Please note it down. If you are claiming a replacement for a damaged item,
+              now email your complete unboxing video to{' '}
+              <a href={`mailto:${SHOP.email}`} className="underline underline-offset-4">
+                {SHOP.email}
+              </a>{' '}
+              with this complaint ID and your order number in the subject line. A claim is
+              not open until we have the video.
+            </p>
+          </>
+        ) : null}
         <p className="mx-auto mt-3 max-w-sm text-[0.875rem] leading-relaxed text-muted">
           We read everything ourselves and usually reply within one working day.
         </p>
