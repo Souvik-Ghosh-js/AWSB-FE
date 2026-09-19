@@ -1,5 +1,6 @@
 'use client';
 
+import { AnimatePresence, motion } from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
@@ -18,6 +19,7 @@ import {
 import { formatPaise, plural } from '@/lib/format';
 import { SHOP } from '@/lib/shop';
 import type { CartAdjustment } from '@/lib/types';
+import { EASE } from './motion';
 import { EmptyState, LineSkeleton } from './ui';
 
 /**
@@ -154,11 +156,21 @@ export function CartView() {
         ) : null}
 
         <ul className="border-t border-line">
+          {/* A removed line collapses and fades, and `layout` slides the lines
+              below it up into the gap, so the shopper sees WHAT left the cart
+              rather than the list simply being shorter. */}
+          <AnimatePresence initial={false}>
           {cart.items.map((item) => (
-            <li
+            <motion.li
               key={item.variantId}
-              className="flex gap-4 border-b border-line py-6 sm:gap-6"
+              layout
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0, x: -24 }}
+              transition={{ duration: 0.32, ease: EASE }}
+              className="overflow-hidden border-b border-line"
             >
+              <div className="flex gap-4 py-6 sm:gap-6">
               <Link
                 href={`/product/${item.slug}`}
                 className="aw-plate relative h-28 w-24 shrink-0 overflow-hidden rounded-sm border border-line sm:h-32 sm:w-28"
@@ -233,8 +245,10 @@ export function CartView() {
                   </div>
                 </div>
               </div>
-            </li>
+              </div>
+            </motion.li>
           ))}
+          </AnimatePresence>
         </ul>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-4">

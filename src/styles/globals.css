@@ -609,16 +609,18 @@ button.aw-btn {
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
     overflow: hidden;
+    /* No `transform` here on purpose. The lift is driven by Motion in
+       ProductCard (whileHover). A CSS transition on transform would ease
+       every frame Motion writes, making the reveal and the hover feel laggy,
+       and a CSS hover transform loses to Motion's inline one anyway. */
     transition:
       box-shadow 260ms ease,
-      border-color 260ms ease,
-      transform 260ms ease;
+      border-color 260ms ease;
   }
 
   .aw-tile:hover {
     box-shadow: var(--shadow-raised);
     border-color: var(--color-line-strong);
-    transform: translateY(-3px);
   }
 
   .aw-price {

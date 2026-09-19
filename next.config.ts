@@ -31,6 +31,13 @@ function remotePatterns(): NonNullable<NonNullable<NextConfig['images']>['remote
 }
 
 const nextConfig: NextConfig = {
+  // `next build` wipes its output folder. Running it while `next dev` is up
+  // deletes the dev server's compiled pages and every route starts returning
+  // 500 until it is restarted. To check a production build alongside a running
+  // dev server, point it somewhere else:
+  //   NEXT_DIST_DIR=.next-verify npx next build
+  // Unset (CI, Netlify, normal use) it stays `.next`.
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   reactStrictMode: true,
   poweredByHeader: false,
   images: {

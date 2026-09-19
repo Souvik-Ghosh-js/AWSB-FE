@@ -3,6 +3,7 @@ import { Fraunces, Inter } from 'next/font/google';
 
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { MotionProvider } from '@/components/motion';
 import { SITE_URL } from '@/lib/api';
 import { SHOP } from '@/lib/shop';
 import '@/styles/globals.css';
@@ -108,13 +109,22 @@ export default function RootLayout({
           Skip to content
         </a>
 
-        <div className="flex min-h-screen flex-col">
-          <Header />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </div>
+        {/* Animated elements are server-rendered in their hidden start state.
+            Without JavaScript nothing would ever reveal them, so force them
+            visible. See components/motion.tsx. */}
+        <noscript>
+          <style>{'[data-motion]{opacity:1!important;transform:none!important}'}</style>
+        </noscript>
+
+        <MotionProvider>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main id="main" className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </MotionProvider>
       </body>
     </html>
   );

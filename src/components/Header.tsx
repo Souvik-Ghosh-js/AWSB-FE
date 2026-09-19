@@ -1,5 +1,6 @@
 'use client';
 
+import { AnimatePresence, motion } from 'motion/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -244,11 +245,23 @@ function CartButton() {
         />
       </svg>
       <span className="hidden text-[0.8125rem] tracking-[0.06em] sm:inline">Cart</span>
-      {count && count > 0 ? (
-        <span className="absolute top-0.5 right-0 flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-accent px-1 text-[0.625rem] font-medium text-[#2a2008] sm:right-0.5">
-          {count > 99 ? '99+' : count}
-        </span>
-      ) : null}
+      {/* Re-keyed on every change, so adding to the cart from anywhere on the
+          page makes the badge pop — the only confirmation a shopper gets when
+          the card they clicked has scrolled the header out of their focus. */}
+      <AnimatePresence>
+        {count && count > 0 ? (
+          <motion.span
+            key={count}
+            initial={{ scale: 0.4, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.4, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 520, damping: 18 }}
+            className="absolute top-0.5 right-0 flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-accent px-1 text-[0.625rem] font-medium text-[#2a2008] sm:right-0.5"
+          >
+            {count > 99 ? '99+' : count}
+          </motion.span>
+        ) : null}
+      </AnimatePresence>
     </Link>
   );
 }

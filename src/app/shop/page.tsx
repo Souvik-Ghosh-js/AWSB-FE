@@ -108,7 +108,7 @@ export default async function ShopPage({
                 view without each card needing to be wide. */}
             <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
               {products.data.items.map((product, i) => (
-                <ProductCard key={product.id} product={product} priority={i < 3} />
+                <ProductCard key={product.id} product={product} priority={i < 3} index={i} />
               ))}
             </div>
 

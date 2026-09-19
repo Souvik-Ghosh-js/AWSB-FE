@@ -19,3 +19,6 @@ Thumbs.db
 *.log
 .vercel
 *.tsbuildinfo
+
+# scratch output of a verification build (see next.config.ts distDir)
+.next-verify/

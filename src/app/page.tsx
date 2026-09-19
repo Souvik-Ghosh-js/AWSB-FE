@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { Reveal } from '@/components/motion';
 import { ProductCard } from '@/components/ProductCard';
 import { Photo } from '@/components/Photo';
 import { EmptyState, ErrorState } from '@/components/ui';
@@ -58,7 +59,7 @@ export default async function HomePage() {
 
       {/* ------------------------------------------------------ products */}
       <section id="shop" className="aw-container mt-10 scroll-mt-24 sm:mt-14">
-        <div className="flex flex-wrap items-end justify-between gap-3">
+        <Reveal className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="aw-eyebrow aw-eyebrow-accent">The shelf</p>
             <h2 className="mt-1.5 text-3xl sm:text-4xl">
@@ -69,7 +70,7 @@ export default async function HomePage() {
           <Link href="/shop" className="aw-btn aw-btn-outline">
             See all →
           </Link>
-        </div>
+        </Reveal>
 
         <div className="mt-7 sm:mt-9">
           {!page1.ok ? (
@@ -82,18 +83,18 @@ export default async function HomePage() {
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
               {grid.map((product, i) => (
-                <ProductCard key={product.id} product={product} priority={i < 4} />
+                <ProductCard key={product.id} product={product} priority={i < 4} index={i} />
               ))}
             </div>
           )}
         </div>
 
         {grid.length > 0 && total > grid.length ? (
-          <div className="mt-10 text-center">
+          <Reveal className="mt-10 text-center">
             <Link href="/shop" className="aw-btn aw-btn-primary aw-btn-lg">
               Shop all attars
             </Link>
-          </div>
+          </Reveal>
         ) : null}
       </section>
 
@@ -113,7 +114,14 @@ function Band({
   families: { name: string; count: number }[];
 }) {
   return (
-    <section className="relative isolate overflow-hidden bg-brand-deep">
+    <section className="relative isolate min-h-[110vw] overflow-hidden bg-brand-deep sm:min-h-0">
+      {/* The bottles sit right-of-centre in the source photo (its left side
+          was inpainted clean specifically so the live headline can sit over
+          it), so the crop is biased right to keep them in frame at every
+          width. The min-height floor keeps the section from the photo's
+          ~1.5:1 aspect being forced much taller/narrower than that by the
+          wrapped mobile headline, which would otherwise crop the bottles
+          out entirely. */}
       <div className="absolute inset-0">
         <Image
           src="/img/hero-banner.jpg"
@@ -121,30 +129,46 @@ function Band({
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[85%_center]"
+          className="object-cover object-[75%_center]"
         />
       </div>
-      {/* Left-to-right fade so the live headline stays readable over the
-          bottles, which the source photo places right-of-centre — the same
-          reason the image itself is cropped toward the right on mobile. */}
+      {/* Left-to-right fade for headline contrast over the photo — the photo
+          itself no longer carries any text, so this only needs to darken,
+          not hide competing copy. */}
       <div
         aria-hidden="true"
         className="absolute inset-0"
-        style={{ background: 'linear-gradient(90deg, rgba(36,10,16,0.96) 0%, rgba(36,10,16,0.88) 45%, rgba(36,10,16,0.45) 100%)' }}
+        style={{ background: 'linear-gradient(90deg, rgba(36,10,16,0.9) 0%, rgba(36,10,16,0.65) 50%, rgba(36,10,16,0.25) 100%)' }}
       />
 
       <div className="aw-container relative py-12 sm:py-16">
         <div className="max-w-3xl">
-          <p className="aw-eyebrow text-accent-bright">Hand-decanted in Rajarhat, Kolkata</p>
-          <h1 className="mt-4 text-4xl text-white sm:text-5xl lg:text-[3.75rem]">
+          {/* The hero is in view at load, so it plays on mount with stepped
+              delays: eyebrow, headline, line, search, families. */}
+          <Reveal as="p" mount y={12} className="aw-eyebrow text-accent-bright">
+            Hand-decanted in Rajarhat, Kolkata
+          </Reveal>
+          <Reveal
+            as="h1"
+            mount
+            delay={0.08}
+            y={24}
+            className="mt-4 text-4xl text-white sm:text-5xl lg:text-[3.75rem]"
+          >
             Attar, sold by the millilitre.
-          </h1>
-          <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/80">
+          </Reveal>
+          <Reveal
+            as="p"
+            mount
+            delay={0.18}
+            className="mt-4 max-w-xl text-lg leading-relaxed text-white/80"
+          >
             Alcohol-free perfume oils in 3, 6 and 12 ml bottles
             {cheapest != null ? `, from ${formatPaise(cheapest, { compact: true })}` : ''}. Delivered
             across India.
-          </p>
+          </Reveal>
 
+          <Reveal mount delay={0.28}>
           <form action="/shop" method="get" role="search" className="mt-7 flex max-w-xl gap-2">
             <label htmlFor="home-search" className="sr-only">
               Search attars
@@ -160,11 +184,12 @@ function Band({
               Search
             </button>
           </form>
+          </Reveal>
 
           {families.length > 0 ? (
             <ul className="mt-6 flex flex-wrap gap-2">
-              {families.slice(0, 9).map((f) => (
-                <li key={f.name}>
+              {families.slice(0, 9).map((f, i) => (
+                <Reveal as="li" mount key={f.name} y={10} delay={0.38 + i * 0.04}>
                   <Link
                     href={`/shop?search=${encodeURIComponent(f.name)}`}
                     className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-white/25 px-3.5 text-sm font-medium text-white transition-colors hover:border-accent-bright hover:bg-white/10"
@@ -172,7 +197,7 @@ function Band({
                     {f.name}
                     <span className="text-xs text-white/55">{f.count}</span>
                   </Link>
-                </li>
+                </Reveal>
               ))}
             </ul>
           ) : null}
@@ -195,11 +220,17 @@ function TrustLine() {
     <div className="border-b border-line bg-surface">
       <div className="aw-container">
         <ul className="grid grid-cols-2 divide-line sm:grid-cols-4 sm:divide-x">
-          {facts.map((f) => (
-            <li key={f.v} className="flex items-baseline justify-center gap-2 px-2 py-4 text-center">
+          {facts.map((f, i) => (
+            <Reveal
+              as="li"
+              key={f.v}
+              y={10}
+              delay={i * 0.08}
+              className="flex items-baseline justify-center gap-2 px-2 py-4 text-center"
+            >
               <span className="aw-display text-lg text-brand">{f.k}</span>
               <span className="text-xs text-soft">{f.v}</span>
-            </li>
+            </Reveal>
           ))}
         </ul>
       </div>
@@ -234,19 +265,19 @@ function Families({ families }: { families: { name: string; count: number }[] })
 
   return (
     <section className="aw-container mt-16 sm:mt-24">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <Reveal className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="aw-eyebrow aw-eyebrow-accent">By family</p>
           <h2 className="mt-1.5 text-3xl sm:text-4xl">Start where your nose leans</h2>
         </div>
-      </div>
+      </Reveal>
 
       <div className="mt-7 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-        {families.slice(0, 8).map((f) => (
+        {families.slice(0, 8).map((f, i) => (
+          <Reveal key={f.name} delay={(i % 4) * 0.07}>
           <Link
-            key={f.name}
             href={`/shop?search=${encodeURIComponent(f.name)}`}
-            className="group relative overflow-hidden rounded-lg"
+            className="group relative block overflow-hidden rounded-lg"
           >
             <Photo
               src={art[f.name.toLowerCase()] ?? null}
@@ -268,6 +299,7 @@ function Families({ families }: { families: { name: string; count: number }[] })
               </span>
             </div>
           </Link>
+          </Reveal>
         ))}
       </div>
     </section>
@@ -290,11 +322,11 @@ function WhyAttar() {
   return (
     <section className="aw-container mt-16 mb-4 sm:mt-24">
       <div className="grid gap-3 rounded-lg border border-line bg-surface p-5 sm:grid-cols-3 sm:gap-6 sm:p-7">
-        {notes.map((n) => (
-          <div key={n.t}>
+        {notes.map((n, i) => (
+          <Reveal key={n.t} delay={i * 0.1}>
             <h3 className="text-lg">{n.t}</h3>
             <p className="mt-1.5 text-sm leading-relaxed text-soft">{n.b}</p>
-          </div>
+          </Reveal>
         ))}
       </div>
     </section>

@@ -1,5 +1,6 @@
 'use client';
 
+import { AnimatePresence, LayoutGroup, motion } from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
@@ -7,6 +8,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { addToCart, quantityOf, subscribeToCart } from '@/lib/cart';
 import { formatPaise } from '@/lib/format';
 import type { ProductSummary, Variant } from '@/lib/types';
+import { EASE, SPRING } from './motion';
 import { Photo } from './Photo';
 
 /**
@@ -21,13 +23,20 @@ import { Photo } from './Photo';
  * (variants with price and stock), so adding to cart costs no request.
  *
  * `priority` is passed for the first row so the LCP image is not lazy-loaded.
+ * Those same cards skip the hidden start state of the scroll reveal: they are
+ * on screen at first paint, and hiding them until hydration would delay LCP.
+ *
+ * `index` is the card's position in its grid; the reveal delay is derived from
+ * its column so each row arrives left to right rather than all at once.
  */
 export function ProductCard({
   product,
   priority = false,
+  index = 0,
 }: {
   product: ProductSummary;
   priority?: boolean;
+  index?: number;
 }) {
   const image = product.primaryImage;
 
@@ -78,7 +87,25 @@ export function ProductCard({
   };
 
   return (
-    <article className="aw-tile group flex flex-col">
+    <motion.article
+      data-motion=""
+      className="aw-tile group flex flex-col"
+      initial={priority ? false : 'hidden'}
+      whileInView="show"
+      viewport={{ once: true, margin: '0px 0px -6% 0px' }}
+      variants={{
+        hidden: { opacity: 0, y: 22 },
+        show: {
+          opacity: 1,
+          y: 0,
+          // Four columns on desktop, two on phones; modulo 4 staggers both.
+          transition: { duration: 0.55, ease: EASE, delay: (index % 4) * 0.07 },
+        },
+      }}
+      // The lift lives here rather than in .aw-tile:hover — once Motion has
+      // written an inline transform, a CSS hover transform can no longer win.
+      whileHover={{ y: -5, transition: SPRING }}
+    >
       {/* ------------------------------------------------------ image */}
       <Link
         href={`/product/${product.slug}`}
@@ -135,42 +162,70 @@ export function ProductCard({
 
         {/* ------------------------------------------------ sizes */}
         {variants.length > 0 ? (
-          <div
-            className="mt-3 grid grid-cols-3 gap-1.5"
-            role="radiogroup"
-            aria-label={`${product.name} size`}
-          >
-            {variants.map((v) => {
-              const active = v.id === selected?.id;
-              return (
-                <button
-                  key={v.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={active}
-                  disabled={!v.inStock}
-                  onClick={() => setSelectedId(v.id)}
-                  className={`flex min-h-11 flex-col items-center justify-center rounded-md border px-1 py-1.5 leading-none transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
-                    active
-                      ? 'border-brand bg-brand text-white'
-                      : 'border-line-strong bg-surface text-ink hover:border-brand'
-                  }`}
-                >
-                  <span className="text-xs font-semibold">{v.sizeMl} ml</span>
-                  <span className={`mt-1 text-2xs ${active ? 'text-white/85' : 'text-muted'}`}>
-                    {formatPaise(v.pricePaise, { compact: true })}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+          // LayoutGroup scopes the sliding highlight to this card, so two cards
+          // on one page can never animate a pill between each other.
+          <LayoutGroup id={`card-sizes-${product.id}`}>
+            <div
+              className="mt-3 grid grid-cols-3 gap-1.5"
+              role="radiogroup"
+              aria-label={`${product.name} size`}
+            >
+              {variants.map((v) => {
+                const active = v.id === selected?.id;
+                return (
+                  <motion.button
+                    key={v.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    disabled={!v.inStock}
+                    onClick={() => setSelectedId(v.id)}
+                    whileTap={v.inStock ? { scale: 0.95 } : undefined}
+                    className={`relative flex min-h-11 flex-col items-center justify-center rounded-md border px-1 py-1.5 leading-none transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                      active
+                        ? 'border-brand text-white'
+                        : 'border-line-strong bg-surface text-ink hover:border-brand'
+                    }`}
+                  >
+                    {active ? (
+                      <motion.span
+                        layoutId="size-pill"
+                        aria-hidden="true"
+                        className="absolute inset-0 rounded-[5px] bg-brand"
+                        transition={SPRING}
+                      />
+                    ) : null}
+                    <span className="relative text-xs font-semibold">{v.sizeMl} ml</span>
+                    <span
+                      className={`relative mt-1 text-2xs ${active ? 'text-white/85' : 'text-muted'}`}
+                    >
+                      {formatPaise(v.pricePaise, { compact: true })}
+                    </span>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </LayoutGroup>
         ) : null}
 
         {/* -------------------------------------------- price + add */}
         <div className="mt-auto pt-4">
           <div className="flex items-baseline justify-between gap-2">
-            <span className="text-2xl font-bold tracking-tight text-ink">
-              {formatPaise(selected?.pricePaise ?? fromPaise, { compact: true })}
+            {/* Keyed by the price so a size change rolls the old figure out
+                and the new one in, instead of the digits just swapping. */}
+            <span className="relative inline-flex overflow-hidden">
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.span
+                  key={selected?.pricePaise ?? fromPaise}
+                  className="text-2xl font-bold tracking-tight text-ink"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.22, ease: EASE }}
+                >
+                  {formatPaise(selected?.pricePaise ?? fromPaise, { compact: true })}
+                </motion.span>
+              </AnimatePresence>
             </span>
             {selected?.compareAtPaise && selected.compareAtPaise > selected.pricePaise ? (
               <span className="text-sm text-muted line-through">
@@ -182,14 +237,27 @@ export function ProductCard({
           </div>
 
           {variants.length > 0 ? (
-            <button
+            <motion.button
               type="button"
               onClick={handleAdd}
               disabled={!canBuy}
-              className={`aw-btn mt-3 w-full ${justAdded ? 'aw-btn-outline' : 'aw-btn-primary'}`}
+              whileTap={canBuy ? { scale: 0.97 } : undefined}
+              transition={SPRING}
+              className={`aw-btn mt-3 w-full overflow-hidden ${justAdded ? 'aw-btn-outline' : 'aw-btn-primary'}`}
             >
-              {justAdded ? 'Added ✓' : canBuy ? 'Add to cart' : 'Sold out'}
-            </button>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={justAdded ? 'added' : canBuy ? 'add' : 'sold-out'}
+                  className="inline-block"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.16, ease: EASE }}
+                >
+                  {justAdded ? 'Added ✓' : canBuy ? 'Add to cart' : 'Sold out'}
+                </motion.span>
+              </AnimatePresence>
+            </motion.button>
           ) : (
             <Link href={`/product/${product.slug}`} className="aw-btn aw-btn-primary mt-3 w-full">
               View
@@ -210,6 +278,6 @@ export function ProductCard({
           </div>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }
