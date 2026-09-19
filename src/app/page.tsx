@@ -52,7 +52,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Band total={total} cheapest={cheapest} families={families} />
+      <Band cheapest={cheapest} families={families} />
       <TrustLine />
 
       {/* ------------------------------------------------------ products */}
@@ -61,12 +61,12 @@ export default async function HomePage() {
           <div>
             <p className="aw-eyebrow aw-eyebrow-accent">The shelf</p>
             <h2 className="mt-1.5 text-3xl sm:text-4xl">
-              {total > 0 ? `${total} attars` : 'Attars'}
+              Attars
               <span className="text-brand-soft">, three sizes each</span>
             </h2>
           </div>
           <Link href="/shop" className="aw-btn aw-btn-outline">
-            See all {total > 0 ? total : ''} →
+            See all →
           </Link>
         </div>
 
@@ -90,7 +90,7 @@ export default async function HomePage() {
         {grid.length > 0 && total > grid.length ? (
           <div className="mt-10 text-center">
             <Link href="/shop" className="aw-btn aw-btn-primary aw-btn-lg">
-              Shop all {total} attars
+              Shop all attars
             </Link>
           </div>
         ) : null}
@@ -105,11 +105,9 @@ export default async function HomePage() {
 /* ------------------------------------------------------------------ band */
 
 function Band({
-  total,
   cheapest,
   families,
 }: {
-  total: number;
   cheapest: number | null;
   families: { name: string; count: number }[];
 }) {
@@ -131,8 +129,7 @@ function Band({
             Attar, sold by the millilitre.
           </h1>
           <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/80">
-            {total > 0 ? `${total} alcohol-free perfume oils` : 'Alcohol-free perfume oils'} in 3, 6
-            and 12 ml bottles
+            Alcohol-free perfume oils in 3, 6 and 12 ml bottles
             {cheapest != null ? `, from ${formatPaise(cheapest, { compact: true })}` : ''}. Delivered
             across India.
           </p>
