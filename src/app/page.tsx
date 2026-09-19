@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { ProductCard } from '@/components/ProductCard';
@@ -113,13 +114,23 @@ function Band({
 }) {
   return (
     <section className="relative isolate overflow-hidden bg-brand-deep">
-      <div className="absolute inset-0 opacity-25">
-        <Photo src="/img/texture.jpg" alt="" ratio="h-full w-full" className="h-full w-full" priority sizes="100vw" />
+      <div className="absolute inset-0">
+        <Image
+          src="/img/hero-banner.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[85%_center]"
+        />
       </div>
+      {/* Left-to-right fade so the live headline stays readable over the
+          bottles, which the source photo places right-of-centre — the same
+          reason the image itself is cropped toward the right on mobile. */}
       <div
         aria-hidden="true"
         className="absolute inset-0"
-        style={{ background: 'linear-gradient(90deg, rgba(36,10,16,0.96) 0%, rgba(36,10,16,0.82) 100%)' }}
+        style={{ background: 'linear-gradient(90deg, rgba(36,10,16,0.96) 0%, rgba(36,10,16,0.88) 45%, rgba(36,10,16,0.45) 100%)' }}
       />
 
       <div className="aw-container relative py-12 sm:py-16">
