@@ -4,21 +4,27 @@ import { useState } from 'react';
 
 import { ApiError, trackOrder } from '@/lib/api';
 import { SHOP } from '@/lib/shop';
-import { isValidEmail, normaliseOrderNumber } from '@/lib/validation';
+import { isValidEmail, isValidMobile, normaliseOrderNumber, normalisePhone } from '@/lib/validation';
 import type { Order } from '@/lib/types';
 import { LineSkeleton } from './ui';
 import { OrderSummaryCard } from './OrderSummaryCard';
 
+type ContactMethod = 'email' | 'phone';
+
 /**
  * Guest order tracking.
  *
- * Gated on order number AND the delivery email, deliberately: order numbers
- * are sequential and guessable, so the email is what prevents one customer
- * enumerating another's address and phone number.
+ * Gated on the order number PLUS either the delivery email or phone,
+ * deliberately: order numbers are sequential and guessable, so a matching
+ * contact detail is what prevents one customer enumerating another's address
+ * and phone number. Either one is an equally strong guard — the shopper picks
+ * whichever they remember from checkout.
  */
 export function TrackOrderForm() {
   const [orderNumber, setOrderNumber] = useState('');
+  const [method, setMethod] = useState<ContactMethod>('email');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,8 +36,12 @@ export function TrackOrderForm() {
       setError('Enter your order number, for example AWSB-2026-00417.');
       return;
     }
-    if (!isValidEmail(email)) {
+    if (method === 'email' && !isValidEmail(email)) {
       setError('Enter the email address you used at checkout.');
+      return;
+    }
+    if (method === 'phone' && !isValidMobile(phone)) {
+      setError('Enter the 10-digit phone number you used at checkout.');
       return;
     }
 
@@ -40,12 +50,18 @@ export function TrackOrderForm() {
     setOrder(null);
 
     try {
-      const result = await trackOrder(number, email.trim());
+      const result = await trackOrder(
+        number,
+        method === 'email' ? { email: email.trim() } : { phone: normalisePhone(phone) }
+      );
       if (!result) {
-        // The same message whether the order is missing or the email does not
-        // match — distinguishing them would confirm which order numbers exist.
+        // The same message whether the order is missing or the contact detail
+        // does not match — distinguishing them would confirm which order
+        // numbers exist.
         setError(
-          'We could not find an order with those details. Check the order number and the email address you used at checkout.'
+          'We could not find an order with those details. Check the order number and the ' +
+            (method === 'email' ? 'email address' : 'phone number') +
+            ' you used at checkout.'
         );
       } else {
         setOrder(result);
@@ -89,19 +105,63 @@ export function TrackOrderForm() {
             </div>
 
             <div>
-              <label htmlFor="track-email" className="aw-label">
-                Email address <span className="text-accent">*</span>
-              </label>
-              <input
-                id="track-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                autoComplete="email"
-                className="aw-field"
-              />
+              <span className="aw-label">Verify with</span>
+              <div className="mt-1.5 inline-flex rounded-md border border-line-strong p-1">
+                <button
+                  type="button"
+                  onClick={() => setMethod('email')}
+                  aria-pressed={method === 'email'}
+                  className={`rounded px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                    method === 'email' ? 'bg-brand text-white' : 'text-muted'
+                  }`}
+                >
+                  Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMethod('phone')}
+                  aria-pressed={method === 'phone'}
+                  className={`rounded px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                    method === 'phone' ? 'bg-brand text-white' : 'text-muted'
+                  }`}
+                >
+                  Phone
+                </button>
+              </div>
             </div>
+
+            {method === 'email' ? (
+              <div>
+                <label htmlFor="track-email" className="aw-label">
+                  Email address <span className="text-accent">*</span>
+                </label>
+                <input
+                  id="track-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  className="aw-field"
+                />
+              </div>
+            ) : (
+              <div>
+                <label htmlFor="track-phone" className="aw-label">
+                  Phone number <span className="text-accent">*</span>
+                </label>
+                <input
+                  id="track-phone"
+                  type="tel"
+                  inputMode="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="98765 43210"
+                  autoComplete="tel"
+                  className="aw-field"
+                />
+              </div>
+            )}
           </div>
 
           {error ? (

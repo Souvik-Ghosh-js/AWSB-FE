@@ -501,9 +501,18 @@ export function verifyCheckout(
  * is going to — order numbers are sequential and therefore guessable, so the
  * matching email is what stops one customer reading another's address.
  */
-export function trackOrder(orderNumber: string, email: string): Promise<Order | null> {
+/**
+ * The order number is always required; either the email or the phone used
+ * at checkout is enough to verify it — the API accepts one or both.
+ */
+export function trackOrder(
+  orderNumber: string,
+  contact: { email?: string; phone?: string }
+): Promise<Order | null> {
   return apiRequestOrNull<Order>('/orders/track', {
-    query: { order_number: orderNumber, email },
+    // buildUrl drops undefined/null/'' entries, so only the contact detail
+    // actually supplied is sent.
+    query: { order_number: orderNumber, email: contact.email, phone: contact.phone },
   });
 }
 

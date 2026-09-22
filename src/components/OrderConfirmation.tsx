@@ -50,7 +50,7 @@ export function OrderConfirmation({
       setAttempted(true);
 
       try {
-        const result = await trackOrder(orderNumber, lookupEmail);
+        const result = await trackOrder(orderNumber, { email: lookupEmail });
         if (!result) {
           setError(
             'We could not find that order. Please check the order number and the email address you used.'
