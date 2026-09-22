@@ -1,12 +1,16 @@
-import Link from 'next/link';
-
-import { formatDateTime, formatPaise, formatPhone, orderStatusLabel } from '@/lib/format';
+import { formatDateTime, formatPaise, orderStatusLabel } from '@/lib/format';
 import type { Order } from '@/lib/types';
 import { StatusBadge } from './ui';
 
 /**
  * The full order, as the customer sees it — used by both the confirmation
  * page and the guest tracking page so the two never drift apart.
+ *
+ * Matches GET /orders/track exactly (confirmed live) — a privacy-reduced
+ * view, since this endpoint is only guarded by a guessable order number
+ * plus an email match. There is no coupon code, customer note, full
+ * address, phone or email here: `shippingTo` is name/city/state/pincode
+ * only, by the API's deliberate design, not an omission to work around.
  *
  * No GSTIN, HSN or tax breakdown appears: the shop is not GST registered and
  * this is a plain receipt, not a tax invoice.
@@ -27,18 +31,7 @@ export function OrderSummaryCard({ order }: { order: Order }) {
             {order.items.map((item, i) => (
               <li key={`${item.sku}-${i}`} className="flex gap-4 py-4 first:pt-0">
                 <div className="min-w-0 flex-1">
-                  <p className="text-[0.9375rem]">
-                    {item.productSlug ? (
-                      <Link
-                        href={`/product/${item.productSlug}`}
-                        className="transition-colors hover:text-brand-soft"
-                      >
-                        {item.productName}
-                      </Link>
-                    ) : (
-                      item.productName
-                    )}
-                  </p>
+                  <p className="text-[0.9375rem]">{item.productName}</p>
                   <p className="mt-1 text-xs text-muted">
                     {item.sizeMl} ml · {formatPaise(item.unitPricePaise, { compact: true })}{' '}
                     each · Qty {item.quantity}
@@ -54,21 +47,21 @@ export function OrderSummaryCard({ order }: { order: Order }) {
           <dl className="mt-6 space-y-2.5 border-t border-line pt-5">
             <TotalRow
               label="Subtotal"
-              value={formatPaise(order.subtotalPaise, { compact: true })}
+              value={formatPaise(order.totals.subtotalPaise, { compact: true })}
             />
-            {order.discountPaise > 0 ? (
+            {order.totals.discountPaise > 0 ? (
               <TotalRow
-                label={order.couponCode ? `Discount (${order.couponCode})` : 'Discount'}
-                value={`−${formatPaise(order.discountPaise, { compact: true })}`}
+                label="Discount"
+                value={`−${formatPaise(order.totals.discountPaise, { compact: true })}`}
                 accent
               />
             ) : null}
             <TotalRow
-              label={`Shipping · ${order.shipZone === 'kolkata' ? 'Kolkata' : 'Rest of India'}`}
+              label="Shipping"
               value={
-                order.shippingPaise === 0
+                order.totals.shippingPaise === 0
                   ? 'Free'
-                  : formatPaise(order.shippingPaise, { compact: true })
+                  : formatPaise(order.totals.shippingPaise, { compact: true })
               }
             />
           </dl>
@@ -76,25 +69,16 @@ export function OrderSummaryCard({ order }: { order: Order }) {
           <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-line pt-4">
             <span className="text-[0.9375rem]">Total paid</span>
             <span className="aw-price text-xl">
-              {formatPaise(order.totalPaise, { compact: true })}
+              {formatPaise(order.totals.totalPaise, { compact: true })}
             </span>
           </div>
-
-          {order.customerNote ? (
-            <div className="mt-6 border-t border-line pt-5">
-              <p className="aw-eyebrow mb-2">Your note</p>
-              <p className="text-[0.8125rem] leading-relaxed text-muted">
-                {order.customerNote}
-              </p>
-            </div>
-          ) : null}
         </div>
       </div>
 
       {/* ------------------------------------------- delivery + tracking */}
       <div className="lg:col-span-5">
         {/* Tracking */}
-        {order.shipment ? (
+        {order.tracking ? (
           <div className="aw-card mb-6 p-6 sm:p-7">
             <h2 className="text-lg">Tracking</h2>
             <hr className="aw-rule mt-3" />
@@ -102,44 +86,44 @@ export function OrderSummaryCard({ order }: { order: Order }) {
             <dl className="mt-5 space-y-3">
               <div>
                 <dt className="aw-eyebrow mb-1">Courier</dt>
-                <dd className="text-[0.9375rem]">{order.shipment.courierName}</dd>
+                <dd className="text-[0.9375rem]">{order.tracking.courierName}</dd>
               </div>
               <div>
                 <dt className="aw-eyebrow mb-1">Tracking number</dt>
                 {/* Shown large and copyable: for CAPTCHA-gated couriers this
                     number IS the tracking experience, not the link. */}
                 <dd className="aw-tabular font-[family-name:var(--font-display)] text-xl break-all text-brand select-all">
-                  {order.shipment.trackingNumber}
+                  {order.tracking.trackingNumber}
                 </dd>
               </div>
-              {order.shipment.shippedAt ? (
+              {order.tracking.shippedAt ? (
                 <div>
                   <dt className="aw-eyebrow mb-1">Dispatched</dt>
                   <dd className="text-[0.8125rem] text-muted">
-                    {formatDateTime(order.shipment.shippedAt)}
+                    {formatDateTime(order.tracking.shippedAt)}
                   </dd>
                 </div>
               ) : null}
             </dl>
 
-            {order.shipment.trackingUrl && order.shipment.supportsDeepLink ? (
+            {order.tracking.trackingUrl && order.tracking.supportsDeepLink ? (
               <a
-                href={order.shipment.trackingUrl}
+                href={order.tracking.trackingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="aw-btn aw-btn-outline aw-btn-sm mt-5 w-full"
               >
                 Track this parcel
               </a>
-            ) : order.shipment.trackingUrl ? (
+            ) : order.tracking.trackingUrl ? (
               <>
                 <a
-                  href={order.shipment.trackingUrl}
+                  href={order.tracking.trackingUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="aw-btn aw-btn-outline aw-btn-sm mt-5 w-full"
                 >
-                  Open {order.shipment.courierName} tracking
+                  Open {order.tracking.courierName} tracking
                 </a>
                 <p className="mt-3 text-xs leading-relaxed text-muted">
                   This courier asks you to enter the number yourself — copy the tracking
@@ -150,44 +134,18 @@ export function OrderSummaryCard({ order }: { order: Order }) {
           </div>
         ) : null}
 
-        {/* Delivery address */}
+        {/* Delivery address — name, city, state, pincode only; the API never
+            sends the full street address, phone or email back here. */}
         <div className="aw-card p-6 sm:p-7">
           <h2 className="text-lg">Delivering to</h2>
           <hr className="aw-rule mt-3" />
 
           <address className="mt-5 text-[0.875rem] leading-relaxed text-ink not-italic">
-            <span className="block font-medium">{order.shippingAddress.fullName}</span>
-            <span className="block text-muted">{order.shippingAddress.line1}</span>
-            {order.shippingAddress.line2 ? (
-              <span className="block text-muted">{order.shippingAddress.line2}</span>
-            ) : null}
-            {order.shippingAddress.landmark ? (
-              <span className="block text-muted">
-                Near {order.shippingAddress.landmark}
-              </span>
-            ) : null}
+            <span className="block font-medium">{order.shippingTo.name}</span>
             <span className="block text-muted">
-              {order.shippingAddress.city}
-              {order.shippingAddress.district
-                ? `, ${order.shippingAddress.district}`
-                : ''}
-            </span>
-            <span className="block text-muted">
-              {order.shippingAddress.state} {order.shippingAddress.pincode}
+              {order.shippingTo.city}, {order.shippingTo.state} {order.shippingTo.pincode}
             </span>
           </address>
-
-          <div className="mt-4 space-y-1 border-t border-line pt-4">
-            <p className="text-[0.8125rem] text-muted">
-              {formatPhone(order.shippingAddress.phone)}
-              {order.shippingAddress.altPhone
-                ? ` · ${formatPhone(order.shippingAddress.altPhone)}`
-                : ''}
-            </p>
-            <p className="text-[0.8125rem] break-all text-muted">
-              {order.shippingAddress.email}
-            </p>
-          </div>
         </div>
 
         {/* Timeline */}
@@ -217,12 +175,6 @@ export function OrderSummaryCard({ order }: { order: Order }) {
               </li>
             ))}
           </ol>
-
-          {order.status === 'cancelled' && order.cancelReason ? (
-            <p className="mt-5 border-t border-line pt-4 text-[0.8125rem] text-muted">
-              Reason: {order.cancelReason}
-            </p>
-          ) : null}
         </div>
       </div>
     </div>
@@ -251,6 +203,9 @@ function TotalRow({
 /**
  * The lifecycle, as the customer experiences it. Cancelled orders get their
  * own short path rather than showing shipping steps that will never happen.
+ *
+ * GET /orders/track has no cancelledAt/cancelReason field, so the cancelled
+ * step can only be marked done, not dated.
  */
 function buildTimeline(order: Order): { label: string; at: string | null; done: boolean }[] {
   if (order.status === 'cancelled' || order.status === 'refunded') {
@@ -258,7 +213,7 @@ function buildTimeline(order: Order): { label: string; at: string | null; done: 
       { label: 'Order placed', at: order.placedAt, done: Boolean(order.placedAt) },
       {
         label: orderStatusLabel(order.status),
-        at: order.cancelledAt,
+        at: null,
         done: true,
       },
     ];

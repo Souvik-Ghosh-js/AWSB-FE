@@ -297,53 +297,64 @@ export interface ShippingAddress {
   country?: string;
 }
 
+/**
+ * One line item on GET /orders/track. Note what is NOT here: no id, no
+ * variantId, no productSlug, no imageUrl — the live endpoint's `items[]`
+ * only ever sends productName/sizeMl/sku/unitPricePaise/quantity/
+ * lineTotalPaise (see tracking.routes.js), so a product link or a photo on
+ * the order summary would need a separate lookup, not a field on this row.
+ */
 export interface OrderItem {
-  id?: number;
-  variantId: number | null;
   productName: string;
-  productSlug?: string | null;
   sizeMl: number;
   sku: string;
   unitPricePaise: number;
   quantity: number;
   lineTotalPaise: number;
-  imageUrl?: string | null;
 }
 
-export interface ShipmentSummary {
-  id: number;
+/** GET /orders/track's `tracking` field — null until a shipment exists. */
+export interface OrderTracking {
   courierName: string;
   courierSlug: string;
+  courierPhone: string | null;
   trackingNumber: string;
   /** Null when the courier CAPTCHA-gates its tracking page. */
   trackingUrl: string | null;
   supportsDeepLink: boolean;
   shippedAt: string | null;
-  deliveredAt: string | null;
 }
 
-/** An order as the customer sees it (confirmation page, guest tracking). */
+/**
+ * An order as the customer sees it (confirmation page, guest tracking) —
+ * the exact shape GET /orders/track returns, confirmed live. This is a
+ * privacy-reduced view (guarded only by a guessable order number + an
+ * email match), which is why it carries `shippingTo` — name/city/state/
+ * pincode only — rather than the full address, and has no coupon code,
+ * customer note, or cancellation reason. There is currently no endpoint
+ * that returns the full address back to the customer post-checkout.
+ */
 export interface Order {
   orderNumber: string;
   status: OrderStatus;
   paymentStatus: PaymentStatus;
-  subtotalPaise: number;
-  discountPaise: number;
-  shippingPaise: number;
-  totalPaise: number;
-  currency: string;
-  couponCode: string | null;
-  items: OrderItem[];
-  shippingAddress: ShippingAddress;
-  shipZone: ShipZone;
-  customerNote: string | null;
-  shipment: ShipmentSummary | null;
   placedAt: string | null;
   shippedAt: string | null;
   deliveredAt: string | null;
-  cancelledAt: string | null;
-  cancelReason: string | null;
-  createdAt: string;
+  shippingTo: {
+    name: string;
+    city: string;
+    state: string;
+    pincode: string;
+  };
+  totals: {
+    subtotalPaise: number;
+    discountPaise: number;
+    shippingPaise: number;
+    totalPaise: number;
+  };
+  items: OrderItem[];
+  tracking: OrderTracking | null;
 }
 
 /* ------------------------------------------------------------- checkout */

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
 import { ApiError, trackOrder } from '@/lib/api';
-import { formatDate, formatPaise, formatPhone } from '@/lib/format';
+import { formatDate, formatPhone } from '@/lib/format';
 import { SHOP } from '@/lib/shop';
 import { isValidEmail } from '@/lib/validation';
 import type { Order } from '@/lib/types';
@@ -194,7 +194,7 @@ export function OrderConfirmation({
       {order ? (
         <div className="mt-12 flex flex-col items-center gap-4 border-t border-line pt-10 sm:flex-row sm:justify-between">
           <p className="text-[0.8125rem] text-muted">
-            Placed {formatDate(order.placedAt ?? order.createdAt)} ·{' '}
+            {order.placedAt ? `Placed ${formatDate(order.placedAt)} · ` : null}
             <StatusBadge status={order.status} />
           </p>
           <div className="flex gap-3">
@@ -225,34 +225,3 @@ export function SupportLine({ orderNumber }: { orderNumber?: string }) {
   );
 }
 
-/** Re-exported so the tracking page can render an identical total block. */
-export function OrderTotals({ order }: { order: Order }) {
-  return (
-    <dl className="space-y-2.5">
-      <Row label="Subtotal" value={formatPaise(order.subtotalPaise, { compact: true })} />
-      {order.discountPaise > 0 ? (
-        <Row
-          label={order.couponCode ? `Discount (${order.couponCode})` : 'Discount'}
-          value={`−${formatPaise(order.discountPaise, { compact: true })}`}
-        />
-      ) : null}
-      <Row
-        label={`Shipping (${order.shipZone === 'kolkata' ? 'Kolkata' : 'Rest of India'})`}
-        value={
-          order.shippingPaise === 0
-            ? 'Free'
-            : formatPaise(order.shippingPaise, { compact: true })
-        }
-      />
-    </dl>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4">
-      <dt className="text-[0.8125rem] text-muted">{label}</dt>
-      <dd className="aw-tabular text-[0.875rem]">{value}</dd>
-    </div>
-  );
-}
