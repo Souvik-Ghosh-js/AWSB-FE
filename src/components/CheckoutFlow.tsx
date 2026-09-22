@@ -314,7 +314,7 @@ export function CheckoutFlow() {
       //    localStorage is trusted.
       const session = await createCheckoutSession({
         items: toCartLines(cart),
-        shippingAddress: normaliseAddress(address),
+        address: normaliseAddress(address),
         couponCode: coupon?.valid ? coupon.code : null,
         customerNote: note.trim() || null,
       });

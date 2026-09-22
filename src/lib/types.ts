@@ -350,7 +350,12 @@ export interface Order {
 
 export interface CheckoutSessionInput {
   items: CartLineInput[];
-  shippingAddress: ShippingAddress;
+  // The live API's checkout schema names this field `address`, not
+  // `shippingAddress` (that name is only used on a completed Order's
+  // response shape). Sending `shippingAddress` here 400s with
+  // VALIDATION_FAILED: "address" "Required" — confirmed by an actual
+  // checkout attempt against production.
+  address: ShippingAddress;
   couponCode?: string | null;
   customerNote?: string | null;
   marketingOptIn?: boolean;
