@@ -50,6 +50,7 @@ import type {
   ShipOrderInput,
   ShippingQuote,
 } from './types';
+import { formatSize } from './format';
 
 /* --------------------------------------------------------------- config */
 
@@ -403,7 +404,8 @@ function normaliseCartValidation(raw: Record<string, unknown>): CartValidation {
     const variantId = Number(i.variantId);
     const name = String(i.productName ?? 'An item');
     const sizeMl = Number(i.sizeMl ?? 0);
-    const label = sizeMl ? `${name} ${sizeMl}ml` : name;
+    const sizeUnit = (typeof i.sizeUnit === 'string' ? i.sizeUnit : 'ml') as ValidatedLine['sizeUnit'];
+    const label = sizeMl ? `${name} ${formatSize(sizeMl, sizeUnit)}` : name;
     const availableQuantity = Number(i.availableQuantity ?? i.availableQty ?? 0);
     const issues = Array.isArray(i.issues) ? (i.issues as string[]) : [];
 
@@ -420,6 +422,7 @@ function normaliseCartValidation(raw: Record<string, unknown>): CartValidation {
       productName: name,
       productSlug: String(i.productSlug ?? ''),
       sizeMl,
+      sizeUnit,
       sku: String(i.sku ?? ''),
       unitPricePaise: Number(i.unitPricePaise ?? 0),
       quantity: Number(i.quantity ?? 0),

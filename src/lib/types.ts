@@ -41,6 +41,8 @@ export type ProductStatus = 'draft' | 'active' | 'archived';
 export interface Variant {
   id: number;
   sizeMl: number;
+  /** Most products are ml — powders/bakhoor/dhoopbatti are g or sticks. */
+  sizeUnit: 'ml' | 'g' | 'sticks';
   sku: string;
   pricePaise: number;
   compareAtPaise: number | null;
@@ -176,6 +178,7 @@ export interface ValidatedCartLine {
   productName: string;
   productSlug: string;
   sizeMl: number;
+  sizeUnit: 'ml' | 'g' | 'sticks';
   sku: string;
   unitPricePaise: number;
   quantity: number;
@@ -307,6 +310,7 @@ export interface ShippingAddress {
 export interface OrderItem {
   productName: string;
   sizeMl: number;
+  sizeUnit: 'ml' | 'g' | 'sticks';
   sku: string;
   unitPricePaise: number;
   quantity: number;

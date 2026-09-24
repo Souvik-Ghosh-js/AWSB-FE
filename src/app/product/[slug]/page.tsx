@@ -7,7 +7,7 @@ import { ProductPurchase } from '@/components/ProductPurchase';
 import { Breadcrumbs, ErrorState, Ornament, Stars } from '@/components/ui';
 import { SITE_URL } from '@/lib/api';
 import { fetchAllProductSlugs, fetchProduct } from '@/lib/data';
-import { formatDate, formatPaise, stripMarkdown, truncate } from '@/lib/format';
+import { formatDate, formatPaise, formatSize, stripMarkdown, truncate } from '@/lib/format';
 import { SHOP } from '@/lib/shop';
 import type { ProductDetail } from '@/lib/types';
 
@@ -255,7 +255,7 @@ export default async function ProductPage({
                 {enabledVariants.map((variant) => (
                   <tr key={variant.id} className="border-b border-line">
                     <td className="py-4 pr-4 font-[family-name:var(--font-display)] text-lg">
-                      {variant.sizeMl} ml
+                      {formatSize(variant.sizeMl, variant.sizeUnit)}
                     </td>
                     <td className="aw-price py-4 pr-4 text-base">
                       {formatPaise(variant.pricePaise, { compact: true })}
@@ -382,7 +382,7 @@ function ProductJsonLd({ product }: { product: ProductDetail }) {
       seller: { '@type': 'Organization', name: SHOP.name },
       offers: product.variants.map((variant) => ({
         '@type': 'Offer',
-        name: `${product.name} — ${variant.sizeMl}ml`,
+        name: `${product.name} — ${formatSize(variant.sizeMl, variant.sizeUnit)}`,
         sku: variant.sku,
         price: (variant.pricePaise / 100).toFixed(2),
         priceCurrency: 'INR',

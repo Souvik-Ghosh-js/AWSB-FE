@@ -99,9 +99,10 @@ export function formatDateTime(value: string | number | Date | null | undefined)
   });
 }
 
-/** "3 ml" — a hair space before the unit reads better than "3ml". */
-export function formatSize(sizeMl: number): string {
-  return `${sizeMl} ml`;
+/** "3 ml" / "25 g" / "1 stick" / "35 sticks" — not every product is ml. */
+export function formatSize(sizeMl: number, sizeUnit: 'ml' | 'g' | 'sticks' = 'ml'): string {
+  if (sizeUnit === 'sticks') return `${sizeMl} stick${sizeMl === 1 ? '' : 's'}`;
+  return `${sizeMl} ${sizeUnit}`;
 }
 
 /** 7003356210 -> "70033 56210", the way Indian numbers are read aloud. */

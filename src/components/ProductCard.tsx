@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
 import { addToCart, quantityOf, subscribeToCart } from '@/lib/cart';
-import { formatPaise } from '@/lib/format';
+import { formatPaise, formatSize } from '@/lib/format';
 import type { ProductSummary, Variant } from '@/lib/types';
 import { EASE, SPRING } from './motion';
 import { Photo } from './Photo';
@@ -195,7 +195,7 @@ export function ProductCard({
                         transition={SPRING}
                       />
                     ) : null}
-                    <span className="relative text-xs font-semibold">{v.sizeMl} ml</span>
+                    <span className="relative text-xs font-semibold">{formatSize(v.sizeMl, v.sizeUnit)}</span>
                     <span
                       className={`relative mt-1 text-2xs ${active ? 'text-white/85' : 'text-muted'}`}
                     >
@@ -232,7 +232,10 @@ export function ProductCard({
                 {formatPaise(selected.compareAtPaise, { compact: true })}
               </span>
             ) : selected ? (
-              <span className="text-xs text-muted">{selected.sizeMl} ml bottle</span>
+              <span className="text-xs text-muted">
+                {formatSize(selected.sizeMl, selected.sizeUnit)}
+                {selected.sizeUnit === 'ml' ? ' bottle' : ''}
+              </span>
             ) : null}
           </div>
 

@@ -22,7 +22,7 @@ import {
   toCartLines,
   type Cart,
 } from '@/lib/cart';
-import { formatPaise, plural } from '@/lib/format';
+import { formatPaise, formatSize, plural } from '@/lib/format';
 import {
   RAZORPAY_THEME,
   describePaymentFailure,
@@ -681,7 +681,7 @@ export function CheckoutFlow() {
                 <div className="min-w-0">
                   <p className="truncate text-[0.875rem]">{item.name}</p>
                   <p className="text-xs text-muted">
-                    {item.sizeMl} ml × {item.quantity}
+                    {formatSize(item.sizeMl, item.sizeUnit)} × {item.quantity}
                   </p>
                 </div>
                 <span className="aw-tabular shrink-0 text-[0.875rem]">

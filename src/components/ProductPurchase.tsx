@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
 import { addToCart, quantityOf, subscribeToCart, MAX_QUANTITY_PER_LINE } from '@/lib/cart';
-import { discountPercent, formatPaise } from '@/lib/format';
+import { discountPercent, formatPaise, formatSize } from '@/lib/format';
 import type { ProductDetail, Variant } from '@/lib/types';
 import { StockBadge } from './ui';
 
@@ -105,7 +105,7 @@ export function ProductPurchase({ product }: { product: ProductDetail }) {
           Choose your size
           {selected ? (
             <span className="ml-2 text-ink normal-case">
-              {selected.sizeMl} ml selected
+              {formatSize(selected.sizeMl, selected.sizeUnit)} selected
             </span>
           ) : null}
         </legend>
@@ -136,7 +136,9 @@ export function ProductPurchase({ product }: { product: ProductDetail }) {
 
                 <span className="font-[family-name:var(--font-display)] text-xl leading-none text-brand">
                   {variant.sizeMl}
-                  <span className="ml-0.5 text-[0.6875rem] tracking-[0.06em]">ml</span>
+                  <span className="ml-0.5 text-[0.6875rem] tracking-[0.06em]">
+                    {variant.sizeUnit === 'sticks' ? 'sk' : variant.sizeUnit}
+                  </span>
                 </span>
 
                 {/* Per-size price — the point of the whole control. */}
@@ -219,7 +221,7 @@ export function ProductPurchase({ product }: { product: ProductDetail }) {
           </p>
         ) : inCart > 0 ? (
           <p className="mt-3 text-[0.8125rem] text-muted">
-            {inCart} × {selected?.sizeMl}ml already in your{' '}
+            {inCart} × {selected ? formatSize(selected.sizeMl, selected.sizeUnit) : ''} already in your{' '}
             <Link href="/cart" className="underline underline-offset-4 hover:text-brand">
               cart
             </Link>

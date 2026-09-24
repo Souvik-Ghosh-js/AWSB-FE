@@ -1,4 +1,4 @@
-import { formatDateTime, formatPaise, orderStatusLabel } from '@/lib/format';
+import { formatDateTime, formatPaise, formatSize, orderStatusLabel } from '@/lib/format';
 import type { Order } from '@/lib/types';
 import { StatusBadge } from './ui';
 
@@ -33,7 +33,7 @@ export function OrderSummaryCard({ order }: { order: Order }) {
                 <div className="min-w-0 flex-1">
                   <p className="text-[0.9375rem]">{item.productName}</p>
                   <p className="mt-1 text-xs text-muted">
-                    {item.sizeMl} ml · {formatPaise(item.unitPricePaise, { compact: true })}{' '}
+                    {formatSize(item.sizeMl, item.sizeUnit)} · {formatPaise(item.unitPricePaise, { compact: true })}{' '}
                     each · Qty {item.quantity}
                   </p>
                 </div>

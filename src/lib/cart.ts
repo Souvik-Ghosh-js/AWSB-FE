@@ -32,6 +32,7 @@ export interface CartItem {
   slug: string;
   name: string;
   sizeMl: number;
+  sizeUnit: 'ml' | 'g' | 'sticks';
   sku: string;
   /** Display cache only — re-priced server-side before payment. */
   unitPricePaise: number;
@@ -116,13 +117,20 @@ function isCartItem(value: unknown): value is CartItem {
   );
 }
 
-/** Clamp anything a hand-edited localStorage entry might contain. */
+const SIZE_UNITS = new Set(['ml', 'g', 'sticks']);
+
+/**
+ * Clamp anything a hand-edited localStorage entry might contain — and, since
+ * this field is new, backfill sizeUnit for a cart saved by an older build
+ * that never wrote it at all.
+ */
 function sanitise(item: CartItem): CartItem {
   return {
     ...item,
     quantity: clampQuantity(item.quantity),
     unitPricePaise: Math.max(0, Math.round(Number(item.unitPricePaise) || 0)),
     sizeMl: Math.max(0, Math.round(Number(item.sizeMl) || 0)),
+    sizeUnit: SIZE_UNITS.has(item.sizeUnit) ? item.sizeUnit : 'ml',
   };
 }
 
@@ -179,6 +187,7 @@ export function addToCart(
       slug: product.slug,
       name: product.name,
       sizeMl: variant.sizeMl,
+      sizeUnit: variant.sizeUnit,
       sku: variant.sku,
       unitPricePaise: variant.pricePaise,
       quantity: qty,

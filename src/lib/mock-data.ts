@@ -149,6 +149,7 @@ function variants(
   return sizes.map((sizeMl, i) => ({
     id: nextId(),
     sizeMl,
+    sizeUnit: 'ml' as const,
     sku: `AWSB-${sizeMl.toString().padStart(2, '0')}-${nextId()}`,
     pricePaise: prices[i] ?? base,
     compareAtPaise: compareAt?.[i] ?? null,
@@ -411,6 +412,7 @@ export const mockOrder: Order = {
     {
       productName: 'Waalid Shamama',
       sizeMl: 6,
+      sizeUnit: 'ml',
       sku: 'AWSB-WSH-06',
       unitPricePaise: 45000,
       quantity: 1,
@@ -419,6 +421,7 @@ export const mockOrder: Order = {
     {
       productName: 'Gulab-e-Bangla',
       sizeMl: 3,
+      sizeUnit: 'ml',
       sku: 'AWSB-GEB-03',
       unitPricePaise: 39000,
       quantity: 1,

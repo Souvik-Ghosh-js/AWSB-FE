@@ -16,7 +16,7 @@ import {
   updateQuantity,
   type Cart,
 } from '@/lib/cart';
-import { formatPaise, plural } from '@/lib/format';
+import { formatPaise, formatSize, plural } from '@/lib/format';
 import { SHOP } from '@/lib/shop';
 import type { CartAdjustment } from '@/lib/types';
 import { EASE } from './motion';
@@ -199,7 +199,7 @@ export function CartView() {
                       </Link>
                     </h2>
                     <p className="mt-1 text-[0.8125rem] text-muted">
-                      {item.sizeMl} ml
+                      {formatSize(item.sizeMl, item.sizeUnit)}
                     </p>
                   </div>
 
@@ -213,7 +213,7 @@ export function CartView() {
                     <button
                       type="button"
                       onClick={() => setCart(updateQuantity(item.variantId, item.quantity - 1))}
-                      aria-label={`Decrease quantity of ${item.name} ${item.sizeMl}ml`}
+                      aria-label={`Decrease quantity of ${item.name} ${formatSize(item.sizeMl, item.sizeUnit)}`}
                       className="flex h-10 w-10 items-center justify-center text-ink transition-colors hover:text-brand"
                     >
                       −
@@ -224,7 +224,7 @@ export function CartView() {
                     <button
                       type="button"
                       onClick={() => setCart(updateQuantity(item.variantId, item.quantity + 1))}
-                      aria-label={`Increase quantity of ${item.name} ${item.sizeMl}ml`}
+                      aria-label={`Increase quantity of ${item.name} ${formatSize(item.sizeMl, item.sizeUnit)}`}
                       className="flex h-10 w-10 items-center justify-center text-ink transition-colors hover:text-brand"
                     >
                       +
