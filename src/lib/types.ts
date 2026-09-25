@@ -361,6 +361,39 @@ export interface Order {
   tracking: OrderTracking | null;
 }
 
+/* --------------------------------------------------------------- account */
+
+/**
+ * One row of GET /me/orders — a lighter shape than Order (no line items, no
+ * tracking), matching listMyOrders' SELECT exactly. Snake_case on the wire,
+ * shaped to camelCase in api.ts like every other endpoint here.
+ */
+export interface MyOrder {
+  id: number;
+  orderNumber: string;
+  status: OrderStatus;
+  paymentStatus: PaymentStatus;
+  totalPaise: number;
+  createdAt: string;
+  placedAt: string | null;
+  shippedAt: string | null;
+  deliveredAt: string | null;
+}
+
+export interface CustomerAccount {
+  id: number;
+  email: string;
+  fullName: string | null;
+  phone: string | null;
+  marketingOptIn: boolean;
+  createdAt: string;
+}
+
+export interface LoginOtpResult {
+  token: string;
+  customer: { id: number; email: string; full_name?: string | null };
+}
+
 /* ------------------------------------------------------------- checkout */
 
 export interface CheckoutSessionInput {

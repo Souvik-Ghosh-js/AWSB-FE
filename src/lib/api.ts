@@ -32,10 +32,13 @@ import type {
   CouponPreview,
   Courier,
   CourierInput,
+  CustomerAccount,
   Feedback,
   FeedbackInput,
   InventoryMovement,
+  LoginOtpResult,
   LowStockRow,
+  MyOrder,
   Order,
   Paginated,
   PincodeLookup,
@@ -517,6 +520,57 @@ export function trackOrder(
     // actually supplied is sent.
     query: { order_number: orderNumber, email: contact.email, phone: contact.phone },
   });
+}
+
+/* --------------------------------------------------------- account: OTP login */
+
+/** Always resolves — the API reports success whether or not the email is known. */
+export function requestLoginOtp(email: string): Promise<{ message: string }> {
+  return apiRequest<{ message: string }>('/auth/login/otp/request', {
+    method: 'POST',
+    body: { email },
+  });
+}
+
+export function verifyLoginOtp(email: string, code: string): Promise<LoginOtpResult> {
+  return apiRequest<LoginOtpResult>('/auth/login/otp/verify', {
+    method: 'POST',
+    body: { email, code },
+  });
+}
+
+/** GET /me leaks snake_case straight off the row — shaped here like every other endpoint. */
+export async function getMyAccount(token: string): Promise<CustomerAccount> {
+  const raw = await apiRequest<Record<string, unknown>>('/me', { token });
+  return {
+    id: Number(raw.id),
+    email: String(raw.email),
+    fullName: (raw.full_name as string | null) ?? null,
+    phone: (raw.phone as string | null) ?? null,
+    marketingOptIn: Boolean(raw.marketing_opt_in),
+    createdAt: String(raw.created_at),
+  };
+}
+
+export async function getMyOrders(
+  token: string,
+  query: { page?: number; limit?: number } = {}
+): Promise<Paginated<MyOrder>> {
+  const raw = await apiRequest<Paginated<Record<string, unknown>>>('/me/orders', { token, query });
+  return {
+    ...raw,
+    items: raw.items.map((row) => ({
+      id: Number(row.id),
+      orderNumber: String(row.order_number),
+      status: row.status as MyOrder['status'],
+      paymentStatus: row.payment_status as MyOrder['paymentStatus'],
+      totalPaise: Number(row.total_paise),
+      createdAt: String(row.created_at),
+      placedAt: (row.placed_at as string | null) ?? null,
+      shippedAt: (row.shipped_at as string | null) ?? null,
+      deliveredAt: (row.delivered_at as string | null) ?? null,
+    })),
+  };
 }
 
 /* ------------------------------------------------ public: reviews & contact */

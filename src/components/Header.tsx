@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { getCart, subscribeToCart } from '@/lib/cart';
+import { getCustomer, subscribeToCustomerSession } from '@/lib/customer-auth';
 import { NAV_LINKS, SHOP } from '@/lib/shop';
 import { Logo } from './Logo';
 
@@ -109,6 +110,7 @@ export function Header() {
                 <path d="M13.2 13.2 17 17" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
               </svg>
             </Link>
+            <AccountButton />
             <CartButton />
 
             <button
@@ -173,7 +175,7 @@ export function Header() {
 
             <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-5 py-7">
               <ul className="space-y-1">
-                {[{ href: '/', label: 'Home' }, ...NAV_LINKS].map((link) => (
+                {[{ href: '/', label: 'Home' }, ...NAV_LINKS, { href: '/account', label: 'Account' }].map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
@@ -262,6 +264,45 @@ function CartButton() {
           </motion.span>
         ) : null}
       </AnimatePresence>
+    </Link>
+  );
+}
+
+/**
+ * Account link. Renders as a plain icon on the server and on first paint —
+ * localStorage does not exist during SSR — then swaps to a signed-in dot
+ * after mount, same hydration-safety pattern as CartButton.
+ */
+function AccountButton() {
+  const [signedIn, setSignedIn] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const sync = () => setSignedIn(getCustomer() !== null);
+    sync();
+    return subscribeToCustomerSession(sync);
+  }, []);
+
+  return (
+    <Link
+      href="/account"
+      className="relative flex h-10 w-10 items-center justify-center text-ink transition-colors hover:text-brand"
+      aria-label={signedIn ? 'Your account' : 'Sign in'}
+    >
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
+        <circle cx="12" cy="8.2" r="3.3" stroke="currentColor" strokeWidth="1.3" />
+        <path
+          d="M5 19.5c1.3-3.4 4-5.2 7-5.2s5.7 1.8 7 5.2"
+          stroke="currentColor"
+          strokeWidth="1.3"
+          strokeLinecap="round"
+        />
+      </svg>
+      {signedIn ? (
+        <span
+          aria-hidden="true"
+          className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-accent"
+        />
+      ) : null}
     </Link>
   );
 }
