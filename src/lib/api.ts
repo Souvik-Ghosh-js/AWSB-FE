@@ -39,6 +39,8 @@ import type {
   LoginOtpResult,
   LowStockRow,
   MyOrder,
+  MyOrderDetail,
+  MyOrderItem,
   Order,
   Paginated,
   PincodeLookup,
@@ -46,6 +48,8 @@ import type {
   ProductInput,
   ProductSummary,
   RazorpayVerifyInput,
+  ReplacementRequest,
+  ReplacementStatus,
   Review,
   ReviewInput,
   ReviewStatus,
@@ -571,6 +575,61 @@ export async function getMyOrders(
       deliveredAt: (row.delivered_at as string | null) ?? null,
     })),
   };
+}
+
+/** GET /me/orders/:id — item-level detail, needed for a replacement request's orderItemId. */
+export async function getMyOrderDetail(token: string, orderId: number): Promise<MyOrderDetail> {
+  const raw = await apiRequest<Record<string, unknown>>(`/me/orders/${orderId}`, { token });
+  const items = (raw.items as Record<string, unknown>[]) ?? [];
+  return {
+    id: Number(raw.id),
+    orderNumber: String(raw.order_number),
+    status: raw.status as MyOrder['status'],
+    paymentStatus: raw.payment_status as MyOrder['paymentStatus'],
+    totalPaise: Number(raw.total_paise),
+    createdAt: String(raw.created_at),
+    placedAt: (raw.placed_at as string | null) ?? null,
+    shippedAt: (raw.shipped_at as string | null) ?? null,
+    deliveredAt: (raw.delivered_at as string | null) ?? null,
+    items: items.map((row) => ({
+      id: Number(row.id),
+      productName: String(row.product_name),
+      sizeMl: Number(row.size_ml),
+      sizeUnit: (row.size_unit as MyOrderItem['sizeUnit']) ?? 'ml',
+      sku: String(row.sku),
+      unitPricePaise: Number(row.unit_price_paise),
+      quantity: Number(row.quantity),
+      lineTotalPaise: Number(row.line_total_paise),
+    })),
+  };
+}
+
+/* ------------------------------------------------------- account: replacements */
+
+export function requestReplacement(
+  token: string,
+  input: { orderItemId: number; reason: string }
+): Promise<{ id: number; requestNumber: string; status: ReplacementStatus }> {
+  return apiRequest('/me/replacement-requests', {
+    method: 'POST',
+    token,
+    body: { orderItemId: input.orderItemId, reason: input.reason },
+  });
+}
+
+export async function getMyReplacementRequests(token: string): Promise<ReplacementRequest[]> {
+  const raw = await apiRequest<{ items: Record<string, unknown>[] }>('/me/replacement-requests', { token });
+  return raw.items.map((r) => ({
+    id: Number(r.id),
+    requestNumber: String(r.requestNumber),
+    status: r.status as ReplacementStatus,
+    reason: String(r.reason),
+    adminNote: (r.adminNote as string | null) ?? null,
+    orderNumber: String(r.orderNumber),
+    productName: String(r.productName),
+    createdAt: String(r.createdAt),
+    decidedAt: (r.decidedAt as string | null) ?? null,
+  }));
 }
 
 /* ------------------------------------------------ public: reviews & contact */

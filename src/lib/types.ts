@@ -389,6 +389,36 @@ export interface CustomerAccount {
   createdAt: string;
 }
 
+/** One line item on GET /me/orders/:id — the id is what a replacement request keys off. */
+export interface MyOrderItem {
+  id: number;
+  productName: string;
+  sizeMl: number;
+  sizeUnit: 'ml' | 'g' | 'sticks';
+  sku: string;
+  unitPricePaise: number;
+  quantity: number;
+  lineTotalPaise: number;
+}
+
+export interface MyOrderDetail extends MyOrder {
+  items: MyOrderItem[];
+}
+
+export type ReplacementStatus = 'pending' | 'approved' | 'rejected';
+
+export interface ReplacementRequest {
+  id: number;
+  requestNumber: string;
+  status: ReplacementStatus;
+  reason: string;
+  adminNote: string | null;
+  orderNumber: string;
+  productName: string;
+  createdAt: string;
+  decidedAt: string | null;
+}
+
 export interface LoginOtpResult {
   token: string;
   customer: { id: number; email: string; full_name?: string | null };
