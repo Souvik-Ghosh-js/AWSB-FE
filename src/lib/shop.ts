@@ -38,7 +38,7 @@ export const SHOP = {
     restOfIndiaPaise: 9900,
     kolkataRangeStart: '700001',
     kolkataRangeEnd: '700199',
-    dispatchDays: '1–2 business days',
+    dispatchDays: '3–5 business days',
     deliveryKolkata: '2–4 business days',
     deliveryIndia: '4–8 business days',
   },

@@ -214,7 +214,7 @@ function TrustLine() {
     { k: '100%', v: 'alcohol-free oils' },
     { k: '3 · 6 · 12', v: 'millilitre bottles' },
     { k: formatPaise(SHOP.shipping.kolkataPaise, { compact: true }), v: 'delivery in Kolkata' },
-    { k: '1–2 days', v: 'to dispatch' },
+    { k: '3–5 days', v: 'to dispatch' },
   ];
   return (
     <div className="border-b border-line bg-surface">
