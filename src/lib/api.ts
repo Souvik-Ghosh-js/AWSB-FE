@@ -318,8 +318,17 @@ export async function apiRequestOrNull<T>(
 
 /* ------------------------------------------------------- public: catalogue */
 
-/** Catalogue pages are indexable, so they are rendered on the server and ISR'd. */
-const CATALOGUE_REVALIDATE = 300;
+/**
+ * Catalogue pages are indexable, so they are rendered on the server and
+ * ISR'd. Short on purpose: the shop grid and a product's own page are cached
+ * independently with no shared invalidation between them (there is an
+ * on-demand /api/revalidate route for that, but it needs a shared secret set
+ * on both this app and the backend to actually fire — until that is
+ * configured, this timer is the only thing that resyncs them). A 60s window
+ * means a stock change is wrong on a cached page for at most a minute,
+ * instead of up to 5+.
+ */
+const CATALOGUE_REVALIDATE = 60;
 
 export interface ProductQuery {
   category?: string;

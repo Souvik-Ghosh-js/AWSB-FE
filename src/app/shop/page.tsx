@@ -7,7 +7,8 @@ import { Breadcrumbs, EmptyState, ErrorState, SectionHeading } from '@/component
 import { fetchCategories, fetchProducts } from '@/lib/data';
 import { isSortValue } from '@/lib/shop';
 
-export const revalidate = 300;
+// Matches CATALOGUE_REVALIDATE in lib/api.ts.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Shop All Attars',

@@ -11,7 +11,8 @@ import { formatDate, formatPaise, formatSize, stripMarkdown, truncate } from '@/
 import { SHOP } from '@/lib/shop';
 import type { ProductDetail } from '@/lib/types';
 
-export const revalidate = 300;
+// Matches CATALOGUE_REVALIDATE in lib/api.ts.
+export const revalidate = 60;
 
 /**
  * Pre-render the catalogue at build time so product pages are static and

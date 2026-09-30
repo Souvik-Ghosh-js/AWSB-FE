@@ -24,7 +24,8 @@ import type { ProductSummary } from '@/lib/types';
  *
  * A server component: every product is in the HTML for search engines.
  */
-export const revalidate = 300;
+// Matches CATALOGUE_REVALIDATE in lib/api.ts.
+export const revalidate = 60;
 
 const HOME_GRID = 12;
 
