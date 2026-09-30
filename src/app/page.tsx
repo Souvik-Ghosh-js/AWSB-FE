@@ -29,6 +29,13 @@ export const revalidate = 60;
 
 const HOME_GRID = 12;
 
+// The home page's product section is headed "Attars" — the non-attar
+// families (sold by the gram or the stick, not the millilitre) should still
+// show up there rather than push it off-catalogue entirely, but always after
+// every attar so the section actually opens on what it says it is.
+const NON_ATTAR_FAMILIES = new Set(['Powder', 'Bakhoor', 'Dhoopbatti']);
+const isAttar = (p: ProductSummary) => !NON_ATTAR_FAMILIES.has(p.scentFamily?.trim() ?? '');
+
 export default async function HomePage() {
   // Two pages of 60 cover the whole catalogue in one round trip each, and
   // give the family chips real counts rather than a hand-typed list.
@@ -49,9 +56,11 @@ export default async function HomePage() {
     return min == null || price < min ? price : min;
   }, null);
 
-  // Featured first if any are flagged, then the rest in catalogue order.
-  const featured = all.filter((p) => p.isFeatured);
-  const grid = [...featured, ...all.filter((p) => !p.isFeatured)].slice(0, HOME_GRID);
+  // Attars first always — the section is headed "Attars" — then featured
+  // within each group, then catalogue order. Array.sort is stable, so within
+  // each tier the original catalogue order survives.
+  const tier = (p: ProductSummary) => (isAttar(p) ? 0 : 2) - (p.isFeatured ? 1 : 0);
+  const grid = [...all].sort((a, b) => tier(a) - tier(b)).slice(0, HOME_GRID);
 
   return (
     <>
