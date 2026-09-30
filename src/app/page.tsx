@@ -36,6 +36,11 @@ const HOME_GRID = 12;
 const NON_ATTAR_FAMILIES = new Set(['Powder', 'Bakhoor', 'Dhoopbatti']);
 const isAttar = (p: ProductSummary) => !NON_ATTAR_FAMILIES.has(p.scentFamily?.trim() ?? '');
 
+// Same "any size still buyable" check ProductCard uses for its own Sold out
+// badge — a product with every size at 0 has nothing to show off here.
+const isInStock = (p: ProductSummary) =>
+  p.variants && p.variants.length > 0 ? p.variants.some((v) => v.inStock) : p.inStock !== false;
+
 export default async function HomePage() {
   // Two pages of 60 cover the whole catalogue in one round trip each, and
   // give the family chips real counts rather than a hand-typed list.
@@ -58,9 +63,14 @@ export default async function HomePage() {
 
   // Attars first always — the section is headed "Attars" — then featured
   // within each group, then catalogue order. Array.sort is stable, so within
-  // each tier the original catalogue order survives.
+  // each tier the original catalogue order survives. Sold-out products are
+  // dropped entirely: a shopper's first look at the shop should not open on
+  // things they cannot buy.
   const tier = (p: ProductSummary) => (isAttar(p) ? 0 : 2) - (p.isFeatured ? 1 : 0);
-  const grid = [...all].sort((a, b) => tier(a) - tier(b)).slice(0, HOME_GRID);
+  const grid = all
+    .filter(isInStock)
+    .sort((a, b) => tier(a) - tier(b))
+    .slice(0, HOME_GRID);
 
   return (
     <>
