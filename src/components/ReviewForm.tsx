@@ -135,10 +135,6 @@ export function ReviewForm({ productSlug }: { productSlug: string }) {
       <button type="submit" disabled={loading} className="aw-btn aw-btn-primary mt-6 w-full">
         {loading ? 'Submitting…' : 'Submit review'}
       </button>
-
-      <p className="mt-4 text-xs leading-relaxed text-muted">
-        Your review is published once a human has read it.
-      </p>
     </form>
   );
 }
