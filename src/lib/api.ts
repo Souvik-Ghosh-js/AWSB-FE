@@ -643,8 +643,16 @@ export async function getMyReplacementRequests(token: string): Promise<Replaceme
 
 /* ------------------------------------------------ public: reviews & contact */
 
-export function submitReview(input: ReviewInput): Promise<{ status: ReviewStatus }> {
-  return apiRequest<{ status: ReviewStatus }>('/reviews', {
+export interface SubmitReviewResult {
+  id: number;
+  status: ReviewStatus;
+  isVerifiedPurchase: boolean;
+  /** The backend's own confirmation copy — show this, don't invent new wording. */
+  message: string;
+}
+
+export function submitReview(input: ReviewInput): Promise<SubmitReviewResult> {
+  return apiRequest<SubmitReviewResult>('/reviews', {
     method: 'POST',
     body: input,
   });

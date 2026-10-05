@@ -4,10 +4,11 @@ import { notFound } from 'next/navigation';
 
 import { ProductGallery } from '@/components/ProductGallery';
 import { ProductPurchase } from '@/components/ProductPurchase';
+import { ReviewsSection } from '@/components/ReviewsSection';
 import { Breadcrumbs, ErrorState, Ornament, Stars } from '@/components/ui';
 import { SITE_URL } from '@/lib/api';
 import { fetchAllProductSlugs, fetchProduct } from '@/lib/data';
-import { formatDate, formatPaise, formatSize, stripMarkdown, truncate } from '@/lib/format';
+import { formatPaise, formatSize, stripMarkdown, truncate } from '@/lib/format';
 import { SHOP } from '@/lib/shop';
 import type { ProductDetail } from '@/lib/types';
 
@@ -283,55 +284,13 @@ export default async function ProductPage({
 
       <Ornament className="mt-20 sm:mt-24" />
 
-      {/* --------------------------------------------------------- reviews */}
-      <section id="reviews" className="mt-16 scroll-mt-24 sm:mt-20">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2 className="text-[1.625rem] sm:text-[2rem]">What customers say</h2>
-            <hr className="aw-rule mt-5 max-w-[12rem]" />
-          </div>
-          {product.ratingCount > 0 ? (
-            <Stars rating={product.ratingAvg} count={product.ratingCount} size="md" />
-          ) : null}
-        </div>
-
-        {approvedReviews.length === 0 ? (
-          <p className="mt-8 max-w-xl text-[0.9375rem] leading-relaxed text-muted">
-            No reviews yet for {product.name}. Reviews are invited by email once an order
-            has been delivered, so everything you read here comes from someone who
-            actually bought the bottle.
-          </p>
-        ) : (
-          <ul className="mt-10 grid gap-x-10 gap-y-10 sm:grid-cols-2">
-            {approvedReviews.map((review) => (
-              <li key={review.id} className="border-t border-line pt-6">
-                <div className="flex items-center justify-between gap-4">
-                  <Stars rating={review.rating} />
-                  {review.isVerifiedPurchase ? (
-                    <span className="aw-badge bg-[color-mix(in_srgb,var(--color-brand-soft)_12%,transparent)] text-brand-soft">
-                      Verified purchase
-                    </span>
-                  ) : null}
-                </div>
-
-                {review.title ? (
-                  <h3 className="mt-3 text-lg">{review.title}</h3>
-                ) : null}
-
-                {review.body ? (
-                  <p className="mt-2 text-[0.875rem] leading-relaxed text-ink">
-                    {review.body}
-                  </p>
-                ) : null}
-
-                <p className="mt-3 text-xs text-muted">
-                  {review.authorName} · {formatDate(review.createdAt)}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <ReviewsSection
+        productName={product.name}
+        productSlug={product.slug}
+        ratingAvg={product.ratingAvg}
+        ratingCount={product.ratingCount}
+        reviews={approvedReviews}
+      />
 
       <div className="mt-16 border-t border-line pt-10 text-center">
         <Link href="/shop" className="aw-btn aw-btn-outline">
