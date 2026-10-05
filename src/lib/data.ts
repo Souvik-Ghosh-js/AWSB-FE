@@ -215,7 +215,7 @@ export interface ShippingRates {
 // not a checkout price, so it does not need getShippingQuote's own no-store
 // freshness. Cached (not no-store) so the homepage and product pages stay
 // statically served instead of going fully dynamic just for this line.
-const SHIPPING_RATES_REVALIDATE = 60;
+const SHIPPING_RATES_REVALIDATE = 15;
 
 function quoteForRate(pincode: string): Promise<ShippingQuote> {
   // subtotal 0 so no free-shipping threshold can make the base rate read as free.

@@ -324,11 +324,13 @@ export async function apiRequestOrNull<T>(
  * independently with no shared invalidation between them (there is an
  * on-demand /api/revalidate route for that, but it needs a shared secret set
  * on both this app and the backend to actually fire — until that is
- * configured, this timer is the only thing that resyncs them). A 60s window
- * means a stock change is wrong on a cached page for at most a minute,
- * instead of up to 5+.
+ * configured, this timer is the only thing that resyncs them). 15s so a
+ * shopper who just submitted a review or watched stock change sees it
+ * reflected on their very next page load rather than waiting out a longer
+ * window — the fetch cache and the page's own ISR cache are two separate
+ * 15s clocks, so the true worst case is close to 30s, not 15s flat.
  */
-const CATALOGUE_REVALIDATE = 60;
+const CATALOGUE_REVALIDATE = 15;
 
 export interface ProductQuery {
   category?: string;

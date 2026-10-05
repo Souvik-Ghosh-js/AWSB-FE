@@ -8,7 +8,7 @@ import { fetchCategories, fetchProducts } from '@/lib/data';
 import { isSortValue } from '@/lib/shop';
 
 // Matches CATALOGUE_REVALIDATE in lib/api.ts.
-export const revalidate = 60;
+export const revalidate = 15;
 
 export const metadata: Metadata = {
   title: 'Shop All Attars',

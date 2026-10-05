@@ -13,7 +13,7 @@ import { SHOP } from '@/lib/shop';
 import type { ProductDetail } from '@/lib/types';
 
 // Matches CATALOGUE_REVALIDATE in lib/api.ts.
-export const revalidate = 60;
+export const revalidate = 15;
 
 /**
  * Pre-render the catalogue at build time so product pages are static and
