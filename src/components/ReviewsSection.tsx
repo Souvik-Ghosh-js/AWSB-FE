@@ -1,12 +1,29 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 import { formatDate } from '@/lib/format';
 import type { Review } from '@/lib/types';
 import { Stars } from './ui';
 import { ReviewForm } from './ReviewForm';
+
+/**
+ * useSearchParams() requires a Suspense boundary for any page that's
+ * statically generated (product/[slug] is — generateStaticParams), or
+ * Next.js fails to prerender the subtree at build time: the whole reviews
+ * section silently stopped rendering in production because of this. Isolated
+ * into its own component so only this sliver suspends, not the heading or
+ * the review list.
+ */
+function OpenFromEmailGate({ onOpen }: { onOpen: () => void }) {
+  const openFromEmail = useSearchParams().get('review') === '1';
+  useEffect(() => {
+    if (openFromEmail) onOpen();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- onOpen is a stable setState call
+  }, [openFromEmail]);
+  return null;
+}
 
 /**
  * Client island so the "Write a review" toggle has somewhere to hold state —
@@ -28,14 +45,17 @@ export function ReviewsSection({
   ratingCount: number;
   reviews: Review[];
 }) {
-  // ?review=1 arrives from the "delivered" email's review links, so the form
-  // is already open when the shopper lands rather than making them hunt for
-  // the button.
-  const openFromEmail = useSearchParams().get('review') === '1';
-  const [showForm, setShowForm] = useState(openFromEmail);
+  const [showForm, setShowForm] = useState(false);
 
   return (
     <section id="reviews" className="mt-16 scroll-mt-24 sm:mt-20">
+      {/* ?review=1 arrives from the "delivered" email's review links, so the
+          form is already open when the shopper lands rather than making them
+          hunt for the button. */}
+      <Suspense fallback={null}>
+        <OpenFromEmailGate onOpen={() => setShowForm(true)} />
+      </Suspense>
+
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="text-[1.625rem] sm:text-[2rem]">What customers say</h2>
