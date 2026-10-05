@@ -7,7 +7,7 @@ import { ProductPurchase } from '@/components/ProductPurchase';
 import { ReviewsSection } from '@/components/ReviewsSection';
 import { Breadcrumbs, ErrorState, Ornament, Stars } from '@/components/ui';
 import { SITE_URL } from '@/lib/api';
-import { fetchAllProductSlugs, fetchProduct } from '@/lib/data';
+import { fetchAllProductSlugs, fetchProduct, fetchShippingRates } from '@/lib/data';
 import { formatPaise, formatSize, stripMarkdown, truncate } from '@/lib/format';
 import { SHOP } from '@/lib/shop';
 import type { ProductDetail } from '@/lib/types';
@@ -73,7 +73,7 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const result = await fetchProduct(slug);
+  const [result, shippingRates] = await Promise.all([fetchProduct(slug), fetchShippingRates()]);
 
   // An API failure is not the same as a missing product: show an error panel
   // rather than a 404 that would tell a crawler the product is gone.
@@ -195,8 +195,8 @@ export default async function ProductPage({
             {[
               'Alcohol-free perfume oil, decanted by hand',
               `Dispatched within ${SHOP.shipping.dispatchDays}`,
-              `₹${SHOP.shipping.kolkataPaise / 100} shipping in Kolkata · ₹${
-                SHOP.shipping.restOfIndiaPaise / 100
+              `₹${shippingRates.kolkataPaise / 100} shipping in Kolkata · ₹${
+                shippingRates.restOfIndiaPaise / 100
               } elsewhere`,
             ].map((line) => (
               <li key={line} className="flex gap-2.5 text-[0.8125rem] text-muted">

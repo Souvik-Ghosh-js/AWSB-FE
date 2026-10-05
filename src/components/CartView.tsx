@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
-import { validateCart } from '@/lib/api';
+import { getShippingQuote, validateCart } from '@/lib/api';
 import {
   clearCart,
   getCart,
@@ -36,12 +36,40 @@ export function CartView() {
   const [adjustments, setAdjustments] = useState<CartAdjustment[]>([]);
   const [validating, setValidating] = useState(false);
   const [validationFailed, setValidationFailed] = useState(false);
+  const [shippingRates, setShippingRates] = useState<{ kolkataPaise: number; restOfIndiaPaise: number }>({
+    kolkataPaise: SHOP.shipping.kolkataPaise,
+    restOfIndiaPaise: SHOP.shipping.restOfIndiaPaise,
+  });
 
   // Read localStorage only after mount — it does not exist during SSR.
   useEffect(() => {
     const sync = () => setCart(getCart());
     sync();
     return subscribeToCart(sync);
+  }, []);
+
+  // Live rates for the informational line below — starts from the SHOP
+  // constant (itself only a documented fallback) and replaces it the moment
+  // the real, admin-editable rate comes back, same quote endpoint checkout
+  // uses, quoted with subtotal 0 so no free-shipping threshold hides the
+  // base rate.
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const [kolkata, restOfIndia] = await Promise.allSettled([
+        getShippingQuote(SHOP.shipping.kolkataRangeStart, 0),
+        getShippingQuote('110001', 0),
+      ]);
+      if (cancelled) return;
+      setShippingRates((prev) => ({
+        kolkataPaise: kolkata.status === 'fulfilled' ? kolkata.value.shippingPaise : prev.kolkataPaise,
+        restOfIndiaPaise:
+          restOfIndia.status === 'fulfilled' ? restOfIndia.value.shippingPaise : prev.restOfIndiaPaise,
+      }));
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const revalidate = useCallback(async (current: Cart) => {
@@ -309,8 +337,8 @@ export function CartView() {
           </Link>
 
           <p className="mt-4 text-xs leading-relaxed text-muted">
-            Shipping is {formatPaise(SHOP.shipping.kolkataPaise, { compact: true })} within
-            Kolkata and {formatPaise(SHOP.shipping.restOfIndiaPaise, { compact: true })}{' '}
+            Shipping is {formatPaise(shippingRates.kolkataPaise, { compact: true })} within
+            Kolkata and {formatPaise(shippingRates.restOfIndiaPaise, { compact: true })}{' '}
             elsewhere in India, calculated from your pincode at checkout.
           </p>
 

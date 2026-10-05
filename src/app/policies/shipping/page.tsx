@@ -2,18 +2,25 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { PolicyPage } from '@/components/PolicyPage';
+import { fetchShippingRates } from '@/lib/data';
 import { formatPaise } from '@/lib/format';
 import { SHOP } from '@/lib/shop';
 
-export const metadata: Metadata = {
-  title: 'Shipping Policy',
-  description: `Shipping rates, despatch and delivery times for ${SHOP.name}. Flat ₹49 within Kolkata and ₹99 elsewhere in India.`,
-  alternates: { canonical: '/policies/shipping' },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const rates = await fetchShippingRates();
+  const kolkata = formatPaise(rates.kolkataPaise, { compact: true });
+  const rest = formatPaise(rates.restOfIndiaPaise, { compact: true });
+  return {
+    title: 'Shipping Policy',
+    description: `Shipping rates, despatch and delivery times for ${SHOP.name}. Flat ${kolkata} within Kolkata and ${rest} elsewhere in India.`,
+    alternates: { canonical: '/policies/shipping' },
+  };
+}
 
-export default function ShippingPolicyPage() {
-  const kolkata = formatPaise(SHOP.shipping.kolkataPaise, { compact: true });
-  const rest = formatPaise(SHOP.shipping.restOfIndiaPaise, { compact: true });
+export default async function ShippingPolicyPage() {
+  const rates = await fetchShippingRates();
+  const kolkata = formatPaise(rates.kolkataPaise, { compact: true });
+  const rest = formatPaise(rates.restOfIndiaPaise, { compact: true });
 
   return (
     <PolicyPage

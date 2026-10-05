@@ -5,7 +5,7 @@ import { Reveal } from '@/components/motion';
 import { ProductCard } from '@/components/ProductCard';
 import { Photo } from '@/components/Photo';
 import { EmptyState, ErrorState } from '@/components/ui';
-import { fetchProducts } from '@/lib/data';
+import { fetchProducts, fetchShippingRates } from '@/lib/data';
 import { formatPaise } from '@/lib/format';
 import { SHOP } from '@/lib/shop';
 import type { ProductSummary } from '@/lib/types';
@@ -44,9 +44,10 @@ const isInStock = (p: ProductSummary) =>
 export default async function HomePage() {
   // Two pages of 60 cover the whole catalogue in one round trip each, and
   // give the family chips real counts rather than a hand-typed list.
-  const [page1, page2] = await Promise.all([
+  const [page1, page2, shippingRates] = await Promise.all([
     fetchProducts({ limit: 60, page: 1 }),
     fetchProducts({ limit: 60, page: 2 }),
+    fetchShippingRates(),
   ]);
 
   const all: ProductSummary[] = [
@@ -75,7 +76,7 @@ export default async function HomePage() {
   return (
     <>
       <Band cheapest={cheapest} families={families} />
-      <TrustLine />
+      <TrustLine kolkataPaise={shippingRates.kolkataPaise} />
 
       {/* ------------------------------------------------------ products */}
       <section id="shop" className="aw-container mt-10 scroll-mt-24 sm:mt-14">
@@ -229,11 +230,11 @@ function Band({
 
 /* ------------------------------------------------------------- trust line */
 
-function TrustLine() {
+function TrustLine({ kolkataPaise }: { kolkataPaise: number }) {
   const facts = [
     { k: '100%', v: 'alcohol-free oils' },
     { k: '3 · 6 · 12', v: 'millilitre bottles' },
-    { k: formatPaise(SHOP.shipping.kolkataPaise, { compact: true }), v: 'delivery in Kolkata' },
+    { k: formatPaise(kolkataPaise, { compact: true }), v: 'delivery in Kolkata' },
     { k: '3–5 days', v: 'to dispatch' },
   ];
   return (

@@ -151,12 +151,12 @@ export interface Review {
 
 /**
  * POST /reviews' real body shape (backend/src/modules/reviews/reviews.routes.js's
- * createBody) — productSlug, not productId; authorName/title/body all optional.
+ * createBody) — productSlug, not productId; no proof of purchase required,
+ * so there's no order number or email here at all; everything but rating is
+ * optional.
  */
 export interface ReviewInput {
   productSlug: string;
-  orderNumber: string;
-  email: string;
   rating: number;
   title?: string;
   body?: string;

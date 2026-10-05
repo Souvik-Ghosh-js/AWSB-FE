@@ -3,17 +3,9 @@
 import { useState } from 'react';
 
 import { ApiError, submitReview } from '@/lib/api';
-import { isPlausibleOrderNumber, isValidEmail, normaliseOrderNumber } from '@/lib/validation';
 
-/**
- * Write a review — gated on order number + email, same proof-of-purchase the
- * backend itself checks (createReview re-verifies all of this server-side;
- * this is only so a shopper finds out they typed something wrong before
- * submitting, not the actual security boundary).
- */
+/** Write a review — open to anyone, no proof of purchase required. */
 export function ReviewForm({ productSlug }: { productSlug: string }) {
-  const [orderNumber, setOrderNumber] = useState('');
-  const [email, setEmail] = useState('');
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [title, setTitle] = useState('');
@@ -25,16 +17,7 @@ export function ReviewForm({ productSlug }: { productSlug: string }) {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const number = normaliseOrderNumber(orderNumber);
 
-    if (!isPlausibleOrderNumber(number)) {
-      setError('Enter your order number, for example AWSB-2026-00417.');
-      return;
-    }
-    if (!isValidEmail(email)) {
-      setError('Enter the email address you used at checkout.');
-      return;
-    }
     if (rating < 1) {
       setError('Choose a star rating.');
       return;
@@ -46,8 +29,6 @@ export function ReviewForm({ productSlug }: { productSlug: string }) {
     try {
       const result = await submitReview({
         productSlug,
-        orderNumber: number,
-        email: email.trim(),
         rating,
         title: title.trim() || undefined,
         body: body.trim() || undefined,
@@ -72,10 +53,6 @@ export function ReviewForm({ productSlug }: { productSlug: string }) {
   return (
     <form onSubmit={submit} className="aw-card p-6 sm:p-8" noValidate>
       <h3 className="text-xl">Write a review</h3>
-      <p className="mt-2 text-[0.8125rem] leading-relaxed text-muted">
-        We verify every review against a delivered order, so it is only open to customers who
-        actually bought this fragrance.
-      </p>
 
       <div className="mt-6">
         <span className="aw-label">Your rating</span>
@@ -106,36 +83,6 @@ export function ReviewForm({ productSlug }: { productSlug: string }) {
               </svg>
             </button>
           ))}
-        </div>
-      </div>
-
-      <div className="mt-5 grid gap-5 sm:grid-cols-2">
-        <div>
-          <label htmlFor="rv-order" className="aw-label">
-            Order number <span className="text-accent">*</span>
-          </label>
-          <input
-            id="rv-order"
-            value={orderNumber}
-            onChange={(e) => setOrderNumber(e.target.value.toUpperCase())}
-            placeholder="AWSB-2026-00417"
-            autoComplete="off"
-            className="aw-field uppercase"
-          />
-        </div>
-        <div>
-          <label htmlFor="rv-email" className="aw-label">
-            Email used at checkout <span className="text-accent">*</span>
-          </label>
-          <input
-            id="rv-email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            autoComplete="email"
-            className="aw-field"
-          />
         </div>
       </div>
 
@@ -190,8 +137,7 @@ export function ReviewForm({ productSlug }: { productSlug: string }) {
       </button>
 
       <p className="mt-4 text-xs leading-relaxed text-muted">
-        Your review is checked against your order before it goes live, and is published once a
-        human has read it.
+        Your review is published once a human has read it.
       </p>
     </form>
   );

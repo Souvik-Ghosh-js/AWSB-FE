@@ -53,9 +53,7 @@ export function ReviewsSection({
 
       {reviews.length === 0 ? (
         <p className="mt-8 max-w-xl text-[0.9375rem] leading-relaxed text-muted">
-          No reviews yet for {productName}. Reviews are open to anyone whose order has been
-          delivered, so everything you read here comes from someone who actually bought the
-          bottle.
+          No reviews yet for {productName}. Be the first to share what you think.
         </p>
       ) : (
         <ul className="mt-10 grid gap-x-10 gap-y-10 sm:grid-cols-2">

@@ -17,7 +17,7 @@
  *    real shopper would be far worse than an honest error.
  */
 
-import { ApiError, USE_MOCKS, getCategories, getProduct, getProducts } from './api';
+import { ApiError, USE_MOCKS, apiRequest, getCategories, getProduct, getProducts } from './api';
 import {
   mockCategories,
   mockProductBySlug,
@@ -25,7 +25,8 @@ import {
   mockProducts,
   toSummary,
 } from './mock-data';
-import type { Category, Paginated, ProductDetail, ProductSummary } from './types';
+import { SHOP } from './shop';
+import type { Category, Paginated, ProductDetail, ProductSummary, ShippingQuote } from './types';
 import type { ProductQuery } from './api';
 
 export type Result<T> =
@@ -201,6 +202,57 @@ export async function fetchAllProductSlugs(): Promise<
   } catch {
     return [];
   }
+}
+
+/* ------------------------------------------------------------- shipping */
+
+export interface ShippingRates {
+  kolkataPaise: number;
+  restOfIndiaPaise: number;
+}
+
+// Same window as CATALOGUE_REVALIDATE in api.ts — this is marketing copy,
+// not a checkout price, so it does not need getShippingQuote's own no-store
+// freshness. Cached (not no-store) so the homepage and product pages stay
+// statically served instead of going fully dynamic just for this line.
+const SHIPPING_RATES_REVALIDATE = 60;
+
+function quoteForRate(pincode: string): Promise<ShippingQuote> {
+  // subtotal 0 so no free-shipping threshold can make the base rate read as free.
+  return apiRequest<ShippingQuote>('/shipping/quote', {
+    query: { pincode, subtotal_paise: 0 },
+    revalidate: SHIPPING_RATES_REVALIDATE,
+    tags: ['shipping-rates'],
+  });
+}
+
+/**
+ * The two base shipping rates, for marketing copy (homepage, product page,
+ * cart summary, shipping policy) that mentions a price before any address is
+ * known — unlike checkout's own getShippingQuote(pincode, subtotal), which
+ * needs a real pincode, is always live (no-store), and is called from the
+ * client. Falls back to the SHOP.shipping constants (which themselves say
+ * "authoritative value is the API's") only if the API is unreachable, so
+ * these pages stop silently going stale the moment an admin changes a rate.
+ */
+export async function fetchShippingRates(): Promise<ShippingRates> {
+  if (USE_MOCKS) {
+    return { kolkataPaise: SHOP.shipping.kolkataPaise, restOfIndiaPaise: SHOP.shipping.restOfIndiaPaise };
+  }
+
+  const [kolkata, restOfIndia] = await Promise.allSettled([
+    quoteForRate(SHOP.shipping.kolkataRangeStart),
+    // Any pincode outside the Kolkata range resolves to the "rest of India"
+    // zone (or whichever fallback zone is configured) via the same live rule
+    // checkout itself uses — not a second, separately-maintained range.
+    quoteForRate('110001'),
+  ]);
+
+  return {
+    kolkataPaise: kolkata.status === 'fulfilled' ? kolkata.value.shippingPaise : SHOP.shipping.kolkataPaise,
+    restOfIndiaPaise:
+      restOfIndia.status === 'fulfilled' ? restOfIndia.value.shippingPaise : SHOP.shipping.restOfIndiaPaise,
+  };
 }
 
 export { toSummary };
